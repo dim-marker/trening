@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qeydiyyat Formu</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #eef2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px 0; }
+        .form-card { background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); width: 100%; max-width: 480px; }
+        h2 { text-align: center; color: #1a365d; margin-bottom: 25px; font-size: 22px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: #4a5568; font-size: 14px; }
+        input, select { width: 100%; padding: 11px; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box; font-size: 15px; outline: none; transition: border 0.2s; }
+        input:focus, select:focus { border-color: #3182ce; }
+        input:disabled, select:disabled { background-color: #edf2f7; cursor: not-allowed; opacity: 0.7; }
+        button { width: 100%; padding: 13px; background-color: #3182ce; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: 600; margin-top: 10px; }
+        button:hover { background-color: #2b6cb0; }
+        #statusMessage { margin-top: 15px; text-align: center; font-weight: 600; font-size: 14px; }
+        .info-text { font-size: 12px; color: #718096; margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="form-card">
+    <h2>Treninqə Qeydiyyat Formu</h2>
+    <form id="registrationForm">
+        <div class="form-group">
+            <label for="fin">FİN Kod:</label>
+            <input type="text" id="fin" name="fin" maxlength="7" required placeholder="Məs: 7ABC123" style="text-transform: uppercase;">
+            <div class="info-text">FİN kodu 7 simvol olduqda avtomatik yoxlanılır.</div>
+        </div>
+        <div class="form-group">
+            <label for="soyad">Soyad:</label>
+            <input type="text" id="soyad" name="soyad" required>
+        </div>
+        <div class="form-group">
+            <label for="ad">Ad:</label>
+            <input type="text" id="ad" name="ad" required>
+        </div>
+        <div class="form-group">
+            <label for="ata_adi">Ata Adı:</label>
+            <input type="text" id="ata_adi" name="ata_adi" required>
+        </div>
+        <div class="form-group">
+            <label for="phone">Mobil Telefon:</label>
+            <input type="tel" id="phone" name="phone" required placeholder="0501234567">
+        </div>
+        <div class="form-group">
+            <label for="fen">Fənn Seçimi:</label>
+            <select id="fen" name="fen" required>
+                <option value="">-- Fənn seçin --</option>
+                <option value="Riyaziyyat">Riyaziyyat</option>
+                <option value="Azərbaycan dili">Azərbaycan dili</option>
+                <option value="İngilis dili">İngilis dili</option>
+                <option value="Rus dili">Rus dili</option>
+                <option value="Coğrafiya">Coğrafiya</option>
+                <option value="Kimya">Kimya</option>
+                <option value="Biologiya">Biologiya</option>
+                <option value="Fizika">Fizika</option>
+                <option value="Tarix">Tarix</option>
+                <option value="İnformatika">İnformatika</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="region">Region Bölmələri:</label>
+            <select id="region" name="region" required onchange="handleRegionChange()">
+                <option value="">-- Region seçin --</option>
+                <option value="BAKI">BAKI</option>
+                <option value="GƏNCƏ">GƏNCƏ</option>
+                <option value="NAXÇIVAN">NAXÇIVAN</option>
+                <option value="ŞƏKİ">ŞƏKİ</option>
+                <option value="BƏRDƏ">BƏRDƏ</option>
+                <option value="ŞİRVAN">ŞİRVAN</option>
+                <option value="GÖYÇAY">GÖYÇAY</option>
+                <option value="LƏNKƏRAN">LƏNKƏRAN</option>
+                <option value="ŞƏMKİR">ŞƏMKİR</option>
+                <option value="XAÇMAZ">XAÇMAZ</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="vaxt">Treninqdə İştirak Vaxtı (Yalnız BAKI üçün):</label>
+            <select id="vaxt" name="vaxt" disabled>
+                <option value="">-- Vaxt seçin --</option>
+                <option value="20 oktyabr I növbə">20 oktyabr I növbə</option>
+                <option value="20 oktyabr II növbə">20 oktyabr II növbə</option>
+                <option value="21 oktyabr I növbə">21 oktyabr I növbə</option>
+            </select>
+        </div>
+
+        <button type="submit" id="submitBtn">Qeydiyyatdan Keç</button>
+    </form>
+    <div id="statusMessage"></div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpcgieqXWBkkyLMWoWvJyIiI7ahsesdbco8G70aQwN8Id8Itk890navp-0-MIBvNOITg/exec";
+
+    function handleRegionChange() {
+        const regionSelect = document.getElementById('region');
+        const vaxtSelect = document.getElementById('vaxt');
+
+        if (regionSelect.value === 'BAKI') {
+            vaxtSelect.disabled = false;
+            vaxtSelect.required = true;
+        } else {
+            vaxtSelect.disabled = true;
+            vaxtSelect.required = false;
+            vaxtSelect.value = '';
+        }
+    }
+
+    let lastCheckedFin = "";
+
+    function checkFinInDatabase() {
+        const finInput = document.getElementById('fin');
+        const finVal = finInput.value.trim().toUpperCase();
+        finInput.value = finVal;
+
+        if (finVal.length < 5 || finVal === lastCheckedFin) return;
+
+        const status = document.getElementById('statusMessage');
+        status.style.color = "#3182ce";
+        status.innerText = "FİN bazada yoxlanılır...";
+
+        lastCheckedFin = finVal;
+
+        fetch(`${SCRIPT_URL}?fin=${encodeURIComponent(finVal)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.exists) {
+                document.getElementById('soyad').value = data.soyad || '';
+                document.getElementById('ad').value = data.ad || '';
+                document.getElementById('ata_adi').value = data.ata_adi || '';
+                document.getElementById('phone').value = data.phone || '';
+                document.getElementById('fen').value = data.fen || '';
+                document.getElementById('region').value = data.region || '';
+                
+                handleRegionChange();
+                
+                if (data.region === 'BAKI') {
+                    document.getElementById('vaxt').value = data.vaxt || '';
+                }
+
+                document.getElementById('submitBtn').innerText = "Məlumatları Yenilə";
+                status.style.color = "#d69e2e";
+                status.innerText = "Sizin qeydiyyatınız tapıldı! Məlumatları redaktə edib yeniləyə bilərsiniz.";
+            } else {
+                resetFormExceptFin(finVal);
+                document.getElementById('submitBtn').innerText = "Qeydiyyatdan Keç";
+                status.style.color = "green";
+                status.innerText = "Yeni FİN kod daxil edildi.";
+            }
+        })
+        .catch(err => {
+            console.error("Xəta:", err);
+            status.style.color = "red";
+            status.innerText = "Yoxlanış zamanı xəta baş verdi.";
+        });
+    }
+
+    function resetFormExceptFin(currentFin) {
+        document.getElementById('soyad').value = '';
+        document.getElementById('ad').value = '';
+        document.getElementById('ata_adi').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('fen').value = '';
+        document.getElementById('region').value = '';
+        document.getElementById('vaxt').value = '';
+        handleRegionChange();
+        document.getElementById('fin').value = currentFin;
+    }
+
+    // 1. FİN xanasından çıxanda yoxla (blur)
+    document.getElementById('fin').addEventListener('blur', checkFinInDatabase);
+
+    // 2. FİN 7 simvol olan kimi anında yoxla (input)
+    document.getElementById('fin').addEventListener('input', function() {
+        if (this.value.trim().length === 7) {
+            checkFinInDatabase();
+        }
+    });
+
+    // Formu göndərmək
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const btn = document.getElementById('submitBtn');
+        const status = document.getElementById('statusMessage');
+
+        btn.disabled = true;
+        btn.innerText = "Məlumatlar bazaya yazılır...";
+        status.innerText = "";
+
+        const formData = new FormData(this);
+
+        fetch(SCRIPT_URL, { method: 'POST', body: formData })
+        .then(res => res.text())
+        .then(response => {
+            status.style.color = "green";
+            status.innerText = response === "Yeniləndi" 
+                ? "Məlumatlarınız uğurla yeniləndi!" 
+                : "Qeydiyyatınız uğurla tamamlandı!";
+            
+            document.getElementById('registrationForm').reset();
+            handleRegionChange();
+            document.getElementById('submitBtn').innerText = "Qeydiyyatdan Keç";
+            lastCheckedFin = "";
+        })
+        .catch(error => {
+            status.style.color = "red";
+            status.innerText = "Xəta baş verdi. Yenidən cəhd edin.";
+            console.error('Xəta:', error);
+        })
+        .finally(() => {
+            btn.disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>
