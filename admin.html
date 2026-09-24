@@ -97,17 +97,30 @@
         <div class="filters">
             <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Axtarış (Ad, Soyad, FİN...)" style="width: 220px;">
             <select id="filterFenn" onchange="filterData()">
-                <option value="">Bütün Fənlər</option>
+               <option value="">-- Fənn seçin --</option>
+                <option value="Coğrafiya">Coğrafiya</option>
                 <option value="Riyaziyyat">Riyaziyyat</option>
                 <option value="Azərbaycan dili">Azərbaycan dili</option>
                 <option value="İngilis dili">İngilis dili</option>
-                <option value="Coğrafiya">Coğrafiya</option>
+                <option value="Rus dili">Rus dili</option>
+                <option value="Kimya">Kimya</option>
+                <option value="Biologiya">Biologiya</option>
+                <option value="Fizika">Fizika</option>
+                <option value="Tarix">Tarix</option>
+                <option value="İnformatika">İnformatika</option>
             </select>
             <select id="filterRegion" onchange="filterData()">
                 <option value="">Bütün Regionlar</option>
                 <option value="BAKI">BAKI</option>
                 <option value="GƏNCƏ">GƏNCƏ</option>
                 <option value="NAXÇIVAN">NAXÇIVAN</option>
+                <option value="NAXÇIVAN">ŞƏKİ</option>
+                <option value="NAXÇIVAN">ŞİRVAN</option>
+                <option value="NAXÇIVAN">ŞƏMKİR</option>
+                <option value="NAXÇIVAN">BƏRDƏ</option>
+                <option value="NAXÇIVAN">GÖYÇAY</option>
+                <option value="NAXÇIVAN">LƏNKƏRAN</option>
+                <option value="NAXÇIVAN">XAÇMAZ</option>
             </select>
             <button class="btn-excel" onclick="exportToCSV()">Excel (CSV) İxrac Et</button>
         </div>
