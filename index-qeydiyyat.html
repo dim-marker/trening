@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Müəllimlərin Treninq Qeydiyyatı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --focus-ring: rgba(37, 99, 235, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            border: 1px solid var(--border-color);
+            padding: 36px 32px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .form-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+
+        .form-header p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-main);
+            background-color: #fff;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px var(--focus-ring);
+        }
+
+        input:disabled, select:disabled {
+            background-color: #f1f5f9;
+            color: #94a3b8;
+            cursor: not-allowed;
+            border-color: #e2e8f0;
+        }
+
+        .fin-input-wrapper {
+            position: relative;
+        }
+
+        .fin-input-wrapper input {
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            margin-top: 8px;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.99);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #statusMessage {
+            margin-top: 18px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #statusMessage.info {
+            display: flex;
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+
+        #statusMessage.loading {
+            display: flex;
+            background-color: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+            letter-spacing: 0.5px;
+        }
+
+        #statusMessage.success {
+            display: flex;
+            background-color: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        #statusMessage.warning {
+            display: flex;
+            background-color: #fefce8;
+            color: #a16207;
+            border: 1px solid #fef08a;
+        }
+
+        #statusMessage.error {
+            display: flex;
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        /* Fırlanan Yüklənmə İkonu (Spinner) */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #0284c7;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="form-header">
+        <h2>Treninqə Qeydiyyat Formu</h2>
+        <p>Məlumatlarınızı təsdiqləyin və ya yeniləyin</p>
+    </div>
+
+    <form id="registrationForm">
+        <div class="form-group">
+            <label for="fin">FİN Kodunuz:</label>
+            <div class="fin-input-wrapper">
+                <input type="text" id="fin" name="fin" maxlength="7" required placeholder=" " autocomplete="off">
+            </div>
+            <div class="info-text">7 simvol daxil etdikdə məlumatlarınız avtomatik gələcək.</div>
+        </div>
+
+        <div class="form-group grid-2">
+            <div>
+                <label for="soyad">Soyad:</label>
+                <input type="text" id="soyad" name="soyad" required placeholder=" ">
+            </div>
+            <div>
+                <label for="ad">Ad:</label>
+                <input type="text" id="ad" name="ad" required placeholder=" ">
+            </div>
+        </div>
+
+        <div class="form-group grid-2">
+            <div>
+                <label for="ata_adi">Ata Adı:</label>
+                <input type="text" id="ata_adi" name="ata_adi" required placeholder=" ">
+            </div>
+            <div>
+                <label for="phone">Mobil Telefon:</label>
+                <input type="tel" id="phone" name="phone" required placeholder=" ">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="fen">Tədris Etdiyiniz Fənn:</label>
+            <select id="fen" name="fen" required onchange="handleFennChange()">
+                <option value="">-- Fənn seçin --</option>
+                <option value="Riyaziyyat">Riyaziyyat</option>
+                <option value="Azərbaycan dili">Azərbaycan dili</option>
+                <option value="İngilis dili">İngilis dili</option>
+                <option value="Rus dili">Rus dili</option>
+                <option value="Coğrafiya">Coğrafiya</option>
+                <option value="Kimya">Kimya</option>
+                <option value="Biologiya">Biologiya</option>
+                <option value="Fizika">Fizika</option>
+                <option value="Tarix">Tarix</option>
+                <option value="İnformatika">İnformatika</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="region">Region Bölməsi:</label>
+            <select id="region" name="region" required onchange="handleRegionChange()">
+                <option value="">-- Region seçin --</option>
+                <option value="BAKI">BAKI</option>
+                <option value="GƏNCƏ">GƏNCƏ</option>
+                <option value="NAXÇIVAN">NAXÇIVAN</option>
+                <option value="ŞƏKİ">ŞƏKİ</option>
+                <option value="BƏRDƏ">BƏRDƏ</option>
+                <option value="ŞİRVAN">ŞİRVAN</option>
+                <option value="GÖYÇAY">GÖYÇAY</option>
+                <option value="LƏNKƏRAN">LƏNKƏRAN</option>
+                <option value="ŞƏMKİR">ŞƏMKİR</option>
+                <option value="XAÇMAZ">XAÇMAZ</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="vaxt">Treninqdə İştirak Vaxtı:</label>
+            <select id="vaxt" name="vaxt" disabled>
+                <option value="">-- Əvvəlcə fənn və region seçin --</option>
+            </select>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn-submit">Məlumatları Təsdiqlə</button>
+    </form>
+
+    <div id="statusMessage"></div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpcgieqXWBkkyLMWoWvJyIiI7ahsesdbco8G70aQwN8Id8Itk890navp-0-MIBvNOITg/exec";
+
+    const vaxtCedveli = {
+        "Coğrafiya": ["06 oktyabr I növbə", "06 oktyabr II növbə", "07 oktyabr I növbə", "07 oktyabr II növbə"],
+        "Riyaziyyat": ["28 oktyabr I növbə", "28 oktyabr II növbə"],
+        "Kimya": ["28 oktyabr II növbə"],
+        "Azərbaycan dili": ["27 oktyabr I növbə", "27 oktyabr II növbə", "28 oktyabr I növbə", "28 oktyabr II növbə", "29 oktyabr I növbə", "29 oktyabr II növbə", "30 oktyabr I növbə", "30 oktyabr II növbə"],
+        "İngilis dili": ["22 oktyabr I növbə"],
+        "Fizika": ["23 oktyabr I növbə"],
+        "Biologiya": ["24 oktyabr I növbə"],
+        "Tarix": ["25 oktyabr I növbə"],
+        "İnformatika": ["26 oktyabr I növbə"],
+        "Rus dili": ["27 oktyabr I növbə"]
+    };
+
+    function updateVaxtOptions(savedVaxt = "") {
+        const region = document.getElementById('region').value;
+        const fenn = document.getElementById('fen').value;
+        const vaxtSelect = document.getElementById('vaxt');
+
+        vaxtSelect.innerHTML = '<option value="">-- Vaxt seçin --</option>';
+
+        if (region === 'BAKI' && fenn && vaxtCedveli[fenn]) {
+            vaxtSelect.disabled = false;
+            vaxtSelect.required = true;
+
+            vaxtCedveli[fenn].forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item;
+                opt.innerText = item;
+                if (item === savedVaxt) opt.selected = true;
+                vaxtSelect.appendChild(opt);
+            });
+        } else {
+            vaxtSelect.disabled = true;
+            vaxtSelect.required = false;
+            if (region !== 'BAKI' && region !== '') {
+                vaxtSelect.innerHTML = '<option value="">Region BAKI olmadığından vaxt seçimi tələb olunmur</option>';
+            }
+        }
+    }
+
+    function handleRegionChange() {
+        updateVaxtOptions();
+    }
+
+    function handleFennChange() {
+        updateVaxtOptions();
+    }
+
+    let lastCheckedFin = "";
+
+    function showStatus(msg, type, showSpinner = false) {
+        const status = document.getElementById('statusMessage');
+        status.className = type;
+        
+        if (showSpinner) {
+            status.innerHTML = `<span class="spinner"></span> <span>${msg}</span>`;
+        } else {
+            status.innerText = msg;
+        }
+    }
+
+    function toggleFormDisabled(isDisabled) {
+        const inputs = document.querySelectorAll('#registrationForm input, #registrationForm select, #submitBtn');
+        inputs.forEach(el => {
+            if (el.id !== 'fin') { // FİN sahəsi aktiv qalır
+                el.disabled = isDisabled;
+            }
+        });
+    }
+
+    function checkFinInDatabase() {
+        const finInput = document.getElementById('fin');
+        const finVal = finInput.value.trim().toUpperCase();
+        finInput.value = finVal;
+
+        if (finVal.length < 5 || finVal === lastCheckedFin) return;
+
+        showStatus("MƏLUMATINIZ AXTARILIR...", "loading", true);
+        toggleFormDisabled(true);
+        lastCheckedFin = finVal;
+
+        fetch(`${SCRIPT_URL}?fin=${encodeURIComponent(finVal)}`)
+        .then(res => res.json())
+        .then(data => {
+            toggleFormDisabled(false);
+            if (data.exists) {
+                document.getElementById('soyad').value = data.soyad || '';
+                document.getElementById('ad').value = data.ad || '';
+                document.getElementById('ata_adi').value = data.ata_adi || '';
+                document.getElementById('phone').value = data.phone || '';
+                document.getElementById('fen').value = data.fen || '';
+                document.getElementById('region').value = data.region || '';
+
+                updateVaxtOptions(data.vaxt || '');
+
+                document.getElementById('submitBtn').innerText = "Məlumatları Yenilə və Təsdiqlə";
+                showStatus("Məlumatlarınız tapıldı. Yoxlayıb dəyişiklik edə və təsdiqləyə bilərsiniz.", "warning");
+            } else {
+                resetFormExceptFin(finVal);
+                document.getElementById('submitBtn').innerText = "Qeydiyyatdan Keç";
+                showStatus("Yeni FİN kod daxil edildi. Xanaları doldurun.", "info");
+            }
+        })
+        .catch(err => {
+            toggleFormDisabled(false);
+            console.error(err);
+            showStatus("Yoxlanış zamanı xəta baş verdi.", "error");
+        });
+    }
+
+    function resetFormExceptFin(currentFin) {
+        document.getElementById('soyad').value = '';
+        document.getElementById('ad').value = '';
+        document.getElementById('ata_adi').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('fen').value = '';
+        document.getElementById('region').value = '';
+        updateVaxtOptions();
+        document.getElementById('fin').value = currentFin;
+    }
+
+    document.getElementById('fin').addEventListener('blur', checkFinInDatabase);
+    document.getElementById('fin').addEventListener('input', function() {
+        if (this.value.trim().length === 7) {
+            checkFinInDatabase();
+        }
+    });
+
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerText = "Yazılır...";
+        showStatus("Məlumatlar cədvələ işlənir...", "loading", true);
+
+        const formData = new FormData(this);
+
+        fetch(SCRIPT_URL, { method: 'POST', body: formData })
+        .then(res => res.text())
+        .then(response => {
+            showStatus("Məlumatlarınız uğurla təsdiqləndi və bazada yeniləndi!", "success");
+            document.getElementById('registrationForm').reset();
+            updateVaxtOptions();
+            document.getElementById('submitBtn').innerText = "Məlumatları Təsdiqlə";
+            lastCheckedFin = "";
+        })
+        .catch(error => {
+            showStatus("Xəta baş verdi. Yenidən cəhd edin.", "error");
+            console.error('Xəta:', error);
+        })
+        .finally(() => {
+            btn.disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>
