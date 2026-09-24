@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qeydiyyat Admin Paneli</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: #f1f5f9; color: #0f172a; padding: 20px; }
+        
+        .login-box { max-width: 400px; margin: 80px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .login-box h2 { margin-bottom: 20px; text-align: center; }
+        .login-box input { width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 6px; margin-bottom: 15px; outline: none; }
+        .login-box button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+
+        .dashboard { display: none; max-width: 1200px; margin: 0 auto; }
+        
+        .section-card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
+
+        .time-form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .time-form select, .time-form input { padding: 10px 14px; border: 1px solid #cbd5e0; border-radius: 6px; outline: none; }
+        .btn-add { padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .btn-delete { padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+        .stats-card { background: #eff6ff; color: #1d4ed8; padding: 10px 20px; border-radius: 8px; font-weight: 600; }
+
+        .filters { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+        .filters select, .filters input { padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; outline: none; }
+        .btn-excel { padding: 10px 20px; background: #16a34a; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-left: auto; }
+
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        th, td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #f8fafc; color: #475569; font-weight: 600; }
+        tr:hover { background-color: #f8fafc; }
+    </style>
+</head>
+<body>
+
+<div id="loginBox" class="login-box">
+    <h2>Admin Girişi</h2>
+    <input type="password" id="adminPassword" placeholder="Admin Şifrəsini Yazın">
+    <button onclick="login()">Daxil Ol</button>
+    <div id="loginError" style="color:red; margin-top:10px; font-size:13px; text-align:center;"></div>
+</div>
+
+<div id="dashboard" class="dashboard">
+    
+    <!-- TRENİNQ VAXTLARININ İDARƏ OLUNMASI -->
+    <div class="section-card">
+        <div class="section-title">⚙️ Fənn üzrə Treninq Vaxtlarının İdarə Edilməsi</div>
+        
+        <form class="time-form" id="addTimeForm" onsubmit="handleAddTime(event)">
+            <select id="newFen" required>
+                <option value="">-- Fənn seçin --</option>
+                <option value="Coğrafiya">Coğrafiya</option>
+                <option value="Riyaziyyat">Riyaziyyat</option>
+                <option value="Azərbaycan dili">Azərbaycan dili</option>
+                <option value="İngilis dili">İngilis dili</option>
+                <option value="Rus dili">Rus dili</option>
+                <option value="Kimya">Kimya</option>
+                <option value="Biologiya">Biologiya</option>
+                <option value="Fizika">Fizika</option>
+                <option value="Tarix">Tarix</option>
+                <option value="İnformatika">İnformatika</option>
+            </select>
+            <input type="text" id="newVaxt" placeholder="Məs: 06 oktyabr I növbə" required style="min-width: 250px;">
+            <button type="submit" class="btn-add">+ Vaxt Əlavə Et</button>
+        </form>
+
+        <div class="table-wrapper" style="max-height: 250px; overflow-y: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fənn</th>
+                        <th>Treninq Vaxtı</th>
+                        <th>Əməliyyat</th>
+                    </tr>
+                </thead>
+                <tbody id="timesTableBody">
+                    <!-- Vaxtlar gələcək -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MÜƏLLİMLƏRİN SİYAHISI -->
+    <div class="section-card">
+        <div class="header">
+            <div class="section-title" style="border:none; margin:0; padding:0;">📋 Qeydiyyatdan Keçən Müəllimlər</div>
+            <div class="stats-card">Ümumi: <span id="totalCount">0</span> nəfər</div>
+        </div>
+
+        <div class="filters">
+            <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Axtarış (Ad, Soyad, FİN...)" style="width: 220px;">
+            <select id="filterFenn" onchange="filterData()">
+                <option value="">Bütün Fənlər</option>
+                <option value="Riyaziyyat">Riyaziyyat</option>
+                <option value="Azərbaycan dili">Azərbaycan dili</option>
+                <option value="İngilis dili">İngilis dili</option>
+                <option value="Coğrafiya">Coğrafiya</option>
+            </select>
+            <select id="filterRegion" onchange="filterData()">
+                <option value="">Bütün Regionlar</option>
+                <option value="BAKI">BAKI</option>
+                <option value="GƏNCƏ">GƏNCƏ</option>
+                <option value="NAXÇIVAN">NAXÇIVAN</option>
+            </select>
+            <button class="btn-excel" onclick="exportToCSV()">Excel (CSV) İxrac Et</button>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>FİN</th>
+                        <th>Soyad, Ad, Ata Adı</th>
+                        <th>Telefon</th>
+                        <th>Fənn</th>
+                        <th>Region</th>
+                        <th>İştirak Vaxtı</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Müəllimlər gələcək -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpcgieqXWBkkyLMWoWvJyIiI7ahsesdbco8G70aQwN8Id8Itk890navp-0-MIBvNOITg/exec";
+    let allData = [];
+    let savedPassword = "";
+
+    function login() {
+        const btn = document.querySelector('.login-box button');
+        savedPassword = document.getElementById('adminPassword').value;
+        const err = document.getElementById('loginError');
+
+        err.style.color = "#2563eb";
+        err.innerText = "Sistemə daxil olunur, zəhmət olmasa gözləyin...";
+        btn.disabled = true;
+
+        fetch(`${SCRIPT_URL}?action=getAllData&password=${encodeURIComponent(savedPassword)}`)
+            .then(res => res.json())
+            .then(res => {
+                btn.disabled = false;
+                if (res.success) {
+                    document.getElementById('loginBox').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    allData = res.data;
+                    renderTable(allData);
+                    loadTimes();
+                } else {
+                    err.style.color = "red";
+                    err.innerText = res.error || "Giriş qadağandır!";
+                }
+            })
+            .catch(() => {
+                btn.disabled = false;
+                err.style.color = "red";
+                err.innerText = "Xəta baş verdi!";
+            });
+    }
+
+    // Vaxtları Yüklə
+    function loadTimes() {
+        fetch(`${SCRIPT_URL}?action=getTimes`)
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                const tbody = document.getElementById('timesTableBody');
+                tbody.innerHTML = '';
+                res.times.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${item.fen}</strong></td>
+                        <td>${item.vaxt}</td>
+                        <td><button class="btn-delete" onclick="deleteTime(${item.row})">Sil</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        });
+    }
+
+    // Yeni Vaxt Əlavə Et
+    function handleAddTime(e) {
+        e.preventDefault();
+        const fen = document.getElementById('newFen').value;
+        const vaxt = document.getElementById('newVaxt').value;
+
+        const formData = new FormData();
+        formData.append('action', 'addTime');
+        formData.append('fen', fen);
+        formData.append('vaxt', vaxt);
+
+        fetch(SCRIPT_URL, { method: 'POST', body: formData })
+        .then(() => {
+            document.getElementById('newVaxt').value = '';
+            loadTimes();
+        });
+    }
+
+    // Vaxtı Sil
+    function deleteTime(row) {
+        if (!confirm("Bu vaxtı silməyə əminsiniz?")) return;
+        
+        const formData = new FormData();
+        formData.append('action', 'deleteTime');
+        formData.append('row', row);
+
+        fetch(SCRIPT_URL, { method: 'POST', body: formData })
+        .then(() => loadTimes());
+    }
+
+    function renderTable(data) {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        document.getElementById('totalCount').innerText = data.length;
+
+        data.forEach((row, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td><strong>${row.fin}</strong></td>
+                <td>${row.soyad} ${row.ad} ${row.ata_adi}</td>
+                <td>${row.phone}</td>
+                <td>${row.fen}</td>
+                <td>${row.region}</td>
+                <td>${row.vaxt || '-'}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function filterData() {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const fenn = document.getElementById('filterFenn').value;
+        const region = document.getElementById('filterRegion').value;
+
+        const filtered = allData.filter(item => {
+            const matchSearch = (item.fin + item.ad + item.soyad + item.phone).toLowerCase().includes(search);
+            const matchFenn = fenn === "" || item.fen === fenn;
+            const matchRegion = region === "" || item.region === region;
+            return matchSearch && matchFenn && matchRegion;
+        });
+
+        renderTable(filtered);
+    }
+
+    function exportToCSV() {
+        let csvContent = "\uFEFFFIN,Soyad,Ad,Ata Adi,Telefon,Fenn,Region,Vaxt\n";
+        allData.forEach(row => {
+            csvContent += `"${row.fin}","${row.soyad}","${row.ad}","${row.ata_adi}","${row.phone}","${row.fen}","${row.region}","${row.vaxt}"\n`;
+        });
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", "muellimler_qeydiyyat.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+
+</body>
+</html>
