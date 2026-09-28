@@ -11,7 +11,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { background-color: #f8fafc; color: #0f172a; padding: 20px; }
         
-        /* GİRİŞ PANANELİ */
+        /* GİRİŞ PANELİ */
         .login-box { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .login-box h2 { margin-bottom: 20px; text-align: center; color: #1e293b; }
         .login-box input { width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 6px; margin-bottom: 15px; outline: none; }
@@ -25,53 +25,47 @@
         .stats-card { background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-weight: 600; border: 1px solid #e2e8f0; }
         .stats-card span { color: #2563eb; font-size: 22px; font-weight: 700; }
 
-        /* VAXT İDARƏ EDİLMƏSİ PANELİ */
-        /* YIĞILIB-AÇILAN PANEL STİLİ */
-.time-management-card {
-    background: white;
-    border-radius: 12px;
-    padding: 16px 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    border: 1px solid #e2e8f0;
-    margin-bottom: 24px;
-    transition: all 0.3s ease;
-}
+        /* YIĞILIB-AÇILAN VAXT PANELİ STİLİ */
+        .time-management-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
 
-.time-management-card summary {
-    font-size: 16px;
-    font-weight: 600;
-    color: #1e293b;
-    cursor: pointer;
-    list-style: none; /* Standart oxu gizlədir */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    user-select: none;
-}
+        .time-management-card summary {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
 
-/* Chrome/Safari üçün standart oxu silmək */
-.time-management-card summary::-webkit-details-marker {
-    display: none;
-}
+        .time-management-card summary::-webkit-details-marker { display: none; }
 
-/* Sağdakı ox işarəsinin fırlanma animasiyası */
-.time-management-card summary .arrow {
-    font-size: 12px;
-    color: #64748b;
-    transition: transform 0.3s ease;
-}
+        .time-management-card summary .arrow {
+            font-size: 12px;
+            color: #64748b;
+            transition: transform 0.3s ease;
+        }
 
-.time-management-card[open] summary .arrow {
-    transform: rotate(180deg);
-}
+        .time-management-card[open] summary .arrow {
+            transform: rotate(180deg);
+        }
 
-.time-card-content {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #f1f5f9;
-}
+        .time-card-content {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f1f5f9;
+        }
         
-        .time-management-card h3 { font-size: 16px; font-weight: 600; color: #1e293b; margin-bottom: 15px; }
         .time-form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
         .time-form select, .time-form input { padding: 10px 14px; border: 1px solid #cbd5e0; border-radius: 6px; outline: none; font-size: 14px; }
         .btn-add-time { padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; }
@@ -117,34 +111,34 @@
         <div class="stats-card">Seçilən Say: <span id="totalCount">0</span> nəfər</div>
     </div>
 
-  <!-- TRENİNQ VAXTLARININ İDARƏ EDİLMƏSİ (YIĞILIB-AÇILAN) -->
-<details class="time-management-card">
-    <summary>⏱️ Fənlər üzrə Treninq Vaxtlarının İdarə Edilməsi <span class="arrow">▼</span></summary>
-    
-    <div class="time-card-content">
-        <div class="time-form">
-            <select id="newTimeFenn" style="width: 200px;">
-                <option value="">-- Fənn seçin --</option>
-                <option value="Riyaziyyat">Riyaziyyat</option>
-                <option value="Azərbaycan dili">Azərbaycan dili</option>
-                <option value="İngilis dili">İngilis dili</option>
-                <option value="Rus dili">Rus dili</option>
-                <option value="Coğrafiya">Coğrafiya</option>
-                <option value="Kimya">Kimya</option>
-                <option value="Biologiya">Biologiya</option>
-                <option value="Fizika">Fizika</option>
-                <option value="Tarix">Tarix</option>
-                <option value="İnformatika">İnformatika</option>
-            </select>
-            <input type="text" id="newTimeText" placeholder="Məs: 08 oktyabr I növbə" style="flex:1; min-width: 200px;">
-            <button class="btn-add-time" onclick="addTimeSlot()">+ Vaxt Əlavə Et</button>
+    <!-- TRENİNQ VAXTLARININ İDARƏ EDİLMƏSİ (YIĞILIB-AÇILAN) -->
+    <details class="time-management-card">
+        <summary>⏱️ Fənlər üzrə Treninq Vaxtlarının İdarə Edilməsi <span class="arrow">▼</span></summary>
+        
+        <div class="time-card-content">
+            <div class="time-form">
+                <select id="newTimeFenn" style="width: 200px;">
+                    <option value="">-- Fənn seçin --</option>
+                    <option value="Riyaziyyat">Riyaziyyat</option>
+                    <option value="Azərbaycan dili">Azərbaycan dili</option>
+                    <option value="İngilis dili">İngilis dili</option>
+                    <option value="Rus dili">Rus dili</option>
+                    <option value="Coğrafiya">Coğrafiya</option>
+                    <option value="Kimya">Kimya</option>
+                    <option value="Biologiya">Biologiya</option>
+                    <option value="Fizika">Fizika</option>
+                    <option value="Tarix">Tarix</option>
+                    <option value="İnformatika">İnformatika</option>
+                </select>
+                <input type="text" id="newTimeText" placeholder="Məs: 08 oktyabr I növbə" style="flex:1; min-width: 200px;">
+                <button class="btn-add-time" onclick="addTimeSlot()">+ Vaxt Əlavə Et</button>
+            </div>
+            <div id="timeStatus" style="font-size:13px; margin-bottom:10px;"></div>
+            <div class="time-tags" id="timeTagsContainer">
+                <!-- Dinamik yüklənən vaxtlar -->
+            </div>
         </div>
-        <div id="timeStatus" style="font-size:13px; margin-bottom:10px;"></div>
-        <div class="time-tags" id="timeTagsContainer">
-            <!-- Dinamik yüklənən vaxtlar -->
-        </div>
-    </div>
-</details>
+    </details>
 
     <!-- İNTERAKTİV ANIMASİYALI QRAFİKLƏR -->
     <div class="charts-grid">
@@ -162,11 +156,11 @@
         </div>
     </div>
 
-    <!-- FİLTRLƏR -->
+    <!-- FİLTRLƏR (DİNAMİK ASILI SİSTEM) -->
     <div class="filters">
-        <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Axtarış (Ad, Soyad, FİN...)" style="width: 220px;">
+        <input type="text" id="searchInput" onkeyup="onFilterChange()" placeholder="Axtarış (Ad, Soyad, FİN...)" style="width: 220px;">
         
-        <select id="filterFenn" onchange="filterData()">
+        <select id="filterFenn" onchange="onFilterChange()">
             <option value="">Bütün Fənlər</option>
             <option value="Riyaziyyat">Riyaziyyat</option>
             <option value="Azərbaycan dili">Azərbaycan dili</option>
@@ -180,7 +174,7 @@
             <option value="İnformatika">İnformatika</option>
         </select>
 
-        <select id="filterRegion" onchange="filterData()">
+        <select id="filterRegion" onchange="onFilterChange()">
             <option value="">Bütün Regionlar</option>
             <option value="BAKI">BAKI</option>
             <option value="GƏNCƏ">GƏNCƏ</option>
@@ -194,7 +188,7 @@
             <option value="XAÇMAZ">XAÇMAZ</option>
         </select>
 
-        <select id="filterVaxt" onchange="filterData()">
+        <select id="filterVaxt" onchange="onFilterChange()">
             <option value="">Bütün Vaxtlar</option>
         </select>
 
@@ -246,8 +240,8 @@
                 document.getElementById('loginBox').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
                 allData = res.data;
-                populateVaxtFilter(allData);
-                filterData();
+                populateVaxtFilterOptions(allData);
+                onFilterChange();
                 loadTimes();
             } else {
                 err.style.color = "red";
@@ -321,7 +315,8 @@
         .then(() => loadTimes());
     }
 
-    function populateVaxtFilter(data) {
+    // İlkin olaraq bazada olan bütün unik vaxtları Vaxt filterinə əlavə edir
+    function populateVaxtFilterOptions(data) {
         const vaxtSelect = document.getElementById('filterVaxt');
         vaxtSelect.innerHTML = '<option value="">Bütün Vaxtlar</option>';
         const uniqueTimes = [...new Set(data.map(item => item.vaxt).filter(v => v && v.trim() !== ''))];
@@ -332,6 +327,69 @@
             opt.innerText = vaxt;
             vaxtSelect.appendChild(opt);
         });
+    }
+
+    // DİNAMİK/ASILI FİLTR MƏNTİQİ
+    function updateFilterDropdowns() {
+        const selectedFenn = document.getElementById('filterFenn').value;
+        const selectedRegion = document.getElementById('filterRegion').value;
+        const selectedVaxt = document.getElementById('filterVaxt').value;
+
+        const activeFennler = new Set();
+        const activeRegionlar = new Set();
+        const activeVaxtlar = new Set();
+
+        allData.forEach(row => {
+            const matchesFenn = !selectedFenn || row.fen === selectedFenn;
+            const matchesRegion = !selectedRegion || row.region === selectedRegion;
+            const matchesVaxt = !selectedVaxt || row.vaxt === selectedVaxt;
+
+            if (matchesRegion && matchesVaxt && row.fen) activeFennler.add(row.fen);
+            if (matchesFenn && matchesVaxt && row.region) activeRegionlar.add(row.region);
+            if (matchesFenn && matchesRegion && row.vaxt) activeVaxtlar.add(row.vaxt);
+        });
+
+        applySelectVisibility('filterFenn', activeFennler);
+        applySelectVisibility('filterRegion', activeRegionlar);
+        applySelectVisibility('filterVaxt', activeVaxtlar);
+    }
+
+    function applySelectVisibility(elementId, activeSet) {
+        const select = document.getElementById(elementId);
+        const options = select.querySelectorAll('option');
+
+        options.forEach(option => {
+            if (option.value === "") return; // "Bütün..." opsiyasına toxunmuruq
+
+            if (activeSet.has(option.value)) {
+                option.disabled = false;
+                option.style.display = "";
+            } else {
+                option.disabled = true;
+                option.style.display = "none";
+            }
+        });
+    }
+
+    function onFilterChange() {
+        updateFilterDropdowns();
+
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const fenn = document.getElementById('filterFenn').value;
+        const region = document.getElementById('filterRegion').value;
+        const vaxt = document.getElementById('filterVaxt').value;
+
+        const filtered = allData.filter(item => {
+            const matchSearch = (item.fin + item.ad + item.soyad + item.phone).toLowerCase().includes(search);
+            const matchFenn = fenn === "" || item.fen === fenn;
+            const matchRegion = region === "" || item.region === region;
+            const matchVaxt = vaxt === "" || item.vaxt === vaxt;
+            
+            return matchSearch && matchFenn && matchRegion && matchVaxt;
+        });
+
+        renderTable(filtered);
+        updateCharts(filtered);
     }
 
     function renderTable(data) {
@@ -352,25 +410,6 @@
             `;
             tbody.appendChild(tr);
         });
-    }
-
-    function filterData() {
-        const search = document.getElementById('searchInput').value.toLowerCase();
-        const fenn = document.getElementById('filterFenn').value;
-        const region = document.getElementById('filterRegion').value;
-        const vaxt = document.getElementById('filterVaxt').value;
-
-        const filtered = allData.filter(item => {
-            const matchSearch = (item.fin + item.ad + item.soyad + item.phone).toLowerCase().includes(search);
-            const matchFenn = fenn === "" || item.fen === fenn;
-            const matchRegion = region === "" || item.region === region;
-            const matchVaxt = vaxt === "" || item.vaxt === vaxt;
-            
-            return matchSearch && matchFenn && matchRegion && matchVaxt;
-        });
-
-        renderTable(filtered);
-        updateCharts(filtered);
     }
 
     // ANIMASİYALI QRAFİK FUNKSİYASI
