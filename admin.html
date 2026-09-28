@@ -26,7 +26,51 @@
         .stats-card span { color: #2563eb; font-size: 22px; font-weight: 700; }
 
         /* VAXT İDARƏ EDİLMƏSİ PANELİ */
-        .time-management-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 24px; }
+        /* YIĞILIB-AÇILAN PANEL STİLİ */
+.time-management-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid #e2e8f0;
+    margin-bottom: 24px;
+    transition: all 0.3s ease;
+}
+
+.time-management-card summary {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    cursor: pointer;
+    list-style: none; /* Standart oxu gizlədir */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+}
+
+/* Chrome/Safari üçün standart oxu silmək */
+.time-management-card summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Sağdakı ox işarəsinin fırlanma animasiyası */
+.time-management-card summary .arrow {
+    font-size: 12px;
+    color: #64748b;
+    transition: transform 0.3s ease;
+}
+
+.time-management-card[open] summary .arrow {
+    transform: rotate(180deg);
+}
+
+.time-card-content {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #f1f5f9;
+}
+        
         .time-management-card h3 { font-size: 16px; font-weight: 600; color: #1e293b; margin-bottom: 15px; }
         .time-form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
         .time-form select, .time-form input { padding: 10px 14px; border: 1px solid #cbd5e0; border-radius: 6px; outline: none; font-size: 14px; }
@@ -73,9 +117,11 @@
         <div class="stats-card">Seçilən Say: <span id="totalCount">0</span> nəfər</div>
     </div>
 
-    <!-- TRENİNQ VAXTLARININ İDARƏ EDİLMƏSİ -->
-    <div class="time-management-card">
-        <h3>⏱️ Fənlər üzrə Treninq Vaxtlarının İdarə Edilməsi</h3>
+  <!-- TRENİNQ VAXTLARININ İDARƏ EDİLMƏSİ (YIĞILIB-AÇILAN) -->
+<details class="time-management-card">
+    <summary>⏱️ Fənlər üzrə Treninq Vaxtlarının İdarə Edilməsi <span class="arrow">▼</span></summary>
+    
+    <div class="time-card-content">
         <div class="time-form">
             <select id="newTimeFenn" style="width: 200px;">
                 <option value="">-- Fənn seçin --</option>
@@ -98,6 +144,7 @@
             <!-- Dinamik yüklənən vaxtlar -->
         </div>
     </div>
+</details>
 
     <!-- İNTERAKTİV ANIMASİYALI QRAFİKLƏR -->
     <div class="charts-grid">
