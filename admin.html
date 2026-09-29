@@ -5,27 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Qeydiyyat Admin Paneli</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chart.js Kitabxanası -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { background-color: #f8fafc; color: #0f172a; padding: 20px; }
         
-        /* GİRİŞ PANELİ */
         .login-box { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .login-box h2 { margin-bottom: 20px; text-align: center; color: #1e293b; }
         .login-box input { width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 6px; margin-bottom: 15px; outline: none; }
         .login-box button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .login-box button:hover { background: #1d4ed8; }
 
-        /* DASHBOARD */
         .dashboard { display: none; max-width: 1200px; margin: 0 auto; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         
         .stats-card { background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-weight: 600; border: 1px solid #e2e8f0; }
         .stats-card span { color: #2563eb; font-size: 22px; font-weight: 700; }
 
-        /* YIĞILIB-AÇILAN VAXT PANELİ STİLİ */
         .time-management-card {
             background: white;
             border-radius: 12px;
@@ -74,29 +70,28 @@
         .time-tag { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 6px 12px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
         .time-tag button { background: none; border: none; color: #ef4444; font-weight: bold; cursor: pointer; font-size: 14px; }
 
-        /* QRAFİKLƏR BÖLMƏSİ */
         .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 24px; }
         .chart-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
         .chart-card h3 { font-size: 15px; font-weight: 600; color: #475569; margin-bottom: 15px; text-align: center; }
         .chart-container { position: relative; height: 230px; width: 100%; display: flex; justify-content: center; }
 
-        /* FİLTRLƏR */
         .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: white; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; }
         .filters select, .filters input { padding: 10px 14px; border: 1px solid #cbd5e0; border-radius: 6px; outline: none; font-size: 14px; }
         .btn-excel { padding: 10px 20px; background: #16a34a; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-left: auto; transition: 0.2s; }
         .btn-excel:hover { background: #15803d; }
 
-        /* CƏDVƏL */
         .table-wrapper { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
         th, td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; }
         th { background-color: #f8fafc; color: #475569; font-weight: 600; }
         tr:hover { background-color: #f1f5f9; }
+
+        .btn-edit { background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: 0.2s; }
+        .btn-edit:hover { background: #1d4ed8; }
     </style>
 </head>
 <body>
 
-<!-- GİRİŞ PƏNCƏRƏSİ -->
 <div id="loginBox" class="login-box">
     <h2>Admin Girişi</h2>
     <input type="password" id="adminPassword" placeholder="Admin Şifrəsini Yazın">
@@ -104,17 +99,14 @@
     <div id="loginError" style="color:red; margin-top:10px; font-size:13px; text-align:center;"></div>
 </div>
 
-<!-- DASHBOARD (ƏSAS SƏHİFƏ) -->
 <div id="dashboard" class="dashboard">
     <div class="header">
         <h2>Müəllimlərin Qeydiyyat Siyahısı</h2>
         <div class="stats-card">Seçilən Say: <span id="totalCount">0</span> nəfər</div>
     </div>
 
-    <!-- TRENİNQ VAXTLARININ İDARƏ EDİLMƏSİ (YIĞILIB-AÇILAN) -->
     <details class="time-management-card">
         <summary>⏱️ Fənlər üzrə Treninq Vaxtlarının İdarə Edilməsi <span class="arrow">▼</span></summary>
-        
         <div class="time-card-content">
             <div class="time-form">
                 <select id="newTimeFenn" style="width: 200px;">
@@ -134,13 +126,10 @@
                 <button class="btn-add-time" onclick="addTimeSlot()">+ Vaxt Əlavə Et</button>
             </div>
             <div id="timeStatus" style="font-size:13px; margin-bottom:10px;"></div>
-            <div class="time-tags" id="timeTagsContainer">
-                <!-- Dinamik yüklənən vaxtlar -->
-            </div>
+            <div class="time-tags" id="timeTagsContainer"></div>
         </div>
     </details>
 
-    <!-- İNTERAKTİV ANIMASİYALI QRAFİKLƏR -->
     <div class="charts-grid">
         <div class="chart-card">
             <h3>📊 Fənlər üzrə Paylanma</h3>
@@ -156,7 +145,6 @@
         </div>
     </div>
 
-    <!-- FİLTRLƏR (DİNAMİK ASILI SİSTEM) -->
     <div class="filters">
         <input type="text" id="searchInput" onkeyup="onFilterChange()" placeholder="Axtarış (Ad, Soyad, FİN...)" style="width: 220px;">
         
@@ -195,7 +183,6 @@
         <button class="btn-excel" onclick="exportToCSV()">Excel (CSV) İxrac Et</button>
     </div>
 
-    <!-- CƏDVƏL -->
     <div class="table-wrapper">
         <table>
             <thead>
@@ -207,11 +194,10 @@
                     <th>Fənn</th>
                     <th>Region</th>
                     <th>İştirak Vaxtı</th>
+                    <th>Əməliyyat</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
-                <!-- Data bura dolacaq -->
-            </tbody>
+            <tbody id="tableBody"></tbody>
         </table>
     </div>
 </div>
@@ -253,6 +239,14 @@
             err.style.color = "red";
             err.innerText = "Xəta baş verdi!";
         });
+    }
+
+    function editUser(fin) {
+        if (!fin) {
+            alert("Müəllimin FİN kodu tapılmadı!");
+            return;
+        }
+        window.open(`index.html?fin=${encodeURIComponent(fin)}`, '_blank');
     }
 
     function loadTimes() {
@@ -315,11 +309,10 @@
         .then(() => loadTimes());
     }
 
-    // İlkin olaraq bazada olan bütün unik vaxtları Vaxt filterinə əlavə edir
     function populateVaxtFilterOptions(data) {
         const vaxtSelect = document.getElementById('filterVaxt');
         vaxtSelect.innerHTML = '<option value="">Bütün Vaxtlar</option>';
-        const uniqueTimes = [...new Set(data.map(item => item.vaxt).filter(v => v && v.trim() !== ''))];
+        const uniqueTimes = [...new Set(data.map(item => item.vaxt).filter(v => v && String(v).trim() !== ''))];
         
         uniqueTimes.sort().forEach(vaxt => {
             const opt = document.createElement('option');
@@ -329,7 +322,6 @@
         });
     }
 
-    // DİNAMİK/ASILI FİLTR MƏNTİQİ
     function updateFilterDropdowns() {
         const selectedFenn = document.getElementById('filterFenn').value;
         const selectedRegion = document.getElementById('filterRegion').value;
@@ -359,7 +351,7 @@
         const options = select.querySelectorAll('option');
 
         options.forEach(option => {
-            if (option.value === "") return; // "Bütün..." opsiyasına toxunmuruq
+            if (option.value === "") return;
 
             if (activeSet.has(option.value)) {
                 option.disabled = false;
@@ -380,7 +372,7 @@
         const vaxt = document.getElementById('filterVaxt').value;
 
         const filtered = allData.filter(item => {
-            const matchSearch = (item.fin + item.ad + item.soyad + item.phone).toLowerCase().includes(search);
+            const matchSearch = ((item.fin || '') + (item.ad || '') + (item.soyad || '') + (item.phone || '')).toLowerCase().includes(search);
             const matchFenn = fenn === "" || item.fen === fenn;
             const matchRegion = region === "" || item.region === region;
             const matchVaxt = vaxt === "" || item.vaxt === vaxt;
@@ -398,21 +390,24 @@
         document.getElementById('totalCount').innerText = data.length;
 
         data.forEach((row, index) => {
+            const fin = row.fin || '';
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${index + 1}</td>
-                <td><strong>${row.fin}</strong></td>
-                <td>${row.soyad} ${row.ad} ${row.ata_adi}</td>
-                <td>${row.phone}</td>
-                <td>${row.fen}</td>
-                <td>${row.region}</td>
+                <td><strong>${fin}</strong></td>
+                <td>${row.soyad || ''} ${row.ad || ''} ${row.ata_adi || ''}</td>
+                <td>${row.phone || ''}</td>
+                <td>${row.fen || ''}</td>
+                <td>${row.region || ''}</td>
                 <td>${row.vaxt || '-'}</td>
+                <td>
+                    <button class="btn-edit" onclick="editUser('${fin}')">✏️ Düzəliş et</button>
+                </td>
             `;
             tbody.appendChild(tr);
         });
     }
 
-    // ANIMASİYALI QRAFİK FUNKSİYASI
     function updateCharts(data) {
         const fennCounts = {};
         data.forEach(d => { if(d.fen) fennCounts[d.fen] = (fennCounts[d.fen] || 0) + 1; });
@@ -422,7 +417,6 @@
 
         const colors = ['#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#64748b'];
 
-        // Fənn Dairəvi Qrafiki (Doughnut)
         const ctxFenn = document.getElementById('fennChart').getContext('2d');
         if (fennChartInstance) {
             fennChartInstance.data.labels = Object.keys(fennCounts);
@@ -444,7 +438,6 @@
             });
         }
 
-        // Region Sütunlu Qrafiki (Bar)
         const ctxRegion = document.getElementById('regionChart').getContext('2d');
         if (regionChartInstance) {
             regionChartInstance.data.labels = Object.keys(regionCounts);
@@ -476,7 +469,7 @@
         const vaxt = document.getElementById('filterVaxt').value;
 
         const currentData = allData.filter(item => {
-            const matchSearch = (item.fin + item.ad + item.soyad + item.phone).toLowerCase().includes(search);
+            const matchSearch = ((item.fin || '') + (item.ad || '') + (item.soyad || '') + (item.phone || '')).toLowerCase().includes(search);
             const matchFenn = fenn === "" || item.fen === fenn;
             const matchRegion = region === "" || item.region === region;
             const matchVaxt = vaxt === "" || item.vaxt === vaxt;
@@ -484,7 +477,7 @@
         });
 
         currentData.forEach(row => {
-            csvContent += `"${row.fin}","${row.soyad}","${row.ad}","${row.ata_adi}","${row.phone}","${row.fen}","${row.region}","${row.vaxt}"\n`;
+            csvContent += `"${row.fin || ''}","${row.soyad || ''}","${row.ad || ''}","${row.ata_adi || ''}","${row.phone || ''}","${row.fen || ''}","${row.region || ''}","${row.vaxt || ''}"\n`;
         });
 
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
