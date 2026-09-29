@@ -303,6 +303,29 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpcgieqXWBkkyLMWoWvJyIiI7ahsesdbco8G70aQwN8Id8Itk890navp-0-MIBvNOITg/exec";
 
+
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const finParam = urlParams.get('fin');
+
+    if (finParam) {
+        const finInput = document.getElementById('fin') || document.querySelector('input[name="fin"]');
+        if (finInput) {
+            finInput.value = finParam;
+            
+            // FİN daxil edildikdə avtomatik axtarış/doldurma tetikləyici
+            const searchBtn = document.getElementById('searchBtn') || document.querySelector('.btn-search');
+            if (searchBtn) {
+                searchBtn.click();
+            } else if (typeof getUserByFin === 'function') {
+                getUserByFin(finParam);
+            }
+        }
+    }
+});
+
+
+    
     const vaxtCedveli = {
         "Coğrafiya": ["06 oktyabr I növbə", "06 oktyabr II növbə", "07 oktyabr I növbə", "07 oktyabr II növbə"],
         "Riyaziyyat": ["28 oktyabr I növbə", "28 oktyabr II növbə"],
