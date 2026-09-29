@@ -75,8 +75,12 @@
         .chart-card h3 { font-size: 15px; font-weight: 600; color: #475569; margin-bottom: 15px; text-align: center; }
         .chart-container { position: relative; height: 230px; width: 100%; display: flex; justify-content: center; }
 
-        .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: white; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: white; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; align-items: center; }
         .filters select, .filters input { padding: 10px 14px; border: 1px solid #cbd5e0; border-radius: 6px; outline: none; font-size: 14px; }
+        
+        .btn-refresh { padding: 10px 16px; background: #475569; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-refresh:hover { background: #334155; }
+
         .btn-excel { padding: 10px 20px; background: #16a34a; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-left: auto; transition: 0.2s; }
         .btn-excel:hover { background: #15803d; }
 
@@ -148,6 +152,8 @@
     <div class="filters">
         <input type="text" id="searchInput" onkeyup="onFilterChange()" placeholder="Axtarış (Ad, Soyad, FİN...)" style="width: 220px;">
         
+        <button class="btn-refresh" onclick="refreshData()">🔄 Yenilə</button>
+
         <select id="filterFenn" onchange="onFilterChange()">
             <option value="">Bütün Fənlər</option>
             <option value="Riyaziyyat">Riyaziyyat</option>
@@ -238,6 +244,34 @@
             btn.disabled = false;
             err.style.color = "red";
             err.innerText = "Xəta baş verdi!";
+        });
+    }
+
+    function refreshData() {
+        const btn = document.querySelector('.btn-refresh');
+        const originalText = btn.innerHTML;
+        
+        btn.disabled = true;
+        btn.innerHTML = "🔄 Yenilənir...";
+
+        fetch(`${SCRIPT_URL}?action=getAllData&password=${encodeURIComponent(savedPassword)}`)
+        .then(res => res.json())
+        .then(res => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            
+            if (res.success) {
+                allData = res.data;
+                populateVaxtFilterOptions(allData);
+                onFilterChange();
+            } else {
+                alert(res.error || "Məlumatları yeniləmək mümkün olmadı!");
+            }
+        })
+        .catch(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            alert("Şəbəkə xətası baş verdi!");
         });
     }
 
