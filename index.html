@@ -304,22 +304,34 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpcgieqXWBkkyLMWoWvJyIiI7ahsesdbco8G70aQwN8Id8Itk890navp-0-MIBvNOITg/exec";
 
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const finParam = urlParams.get('fin');
 
     if (finParam) {
-        const finInput = document.getElementById('fin') || document.querySelector('input[name="fin"]');
+        // FİN inputunu tapırıq (id="fin" və ya name="fin" və ya input növünə görə)
+        const finInput = document.getElementById('fin') || 
+                         document.querySelector('input[name="fin"]') || 
+                         document.querySelector('input[placeholder*="FİN"]');
+
         if (finInput) {
             finInput.value = finParam;
             
-            // FİN daxil edildikdə avtomatik axtarış/doldurma tetikləyici
-            const searchBtn = document.getElementById('searchBtn') || document.querySelector('.btn-search');
-            if (searchBtn) {
-                searchBtn.click();
-            } else if (typeof getUserByFin === 'function') {
-                getUserByFin(finParam);
-            }
+            // Input tərəfində input/change hadisələrini tetikləyirik
+            finInput.dispatchEvent(new Event('input', { bubbles: true }));
+            finInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+            // Səhifənin tam hazır olmasını gözləyib 500ms sonra axtarış düyməsini sıxırıq
+            setTimeout(() => {
+                const searchBtn = document.getElementById('searchBtn') || 
+                                  document.querySelector('button[type="submit"]') || 
+                                  document.querySelector('.btn-search') || 
+                                  document.querySelector('button');
+
+                if (searchBtn) {
+                    searchBtn.click();
+                }
+            }, 500);
         }
     }
 });
