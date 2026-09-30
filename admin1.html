@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qeydiyyat Admin Paneli</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: #f8fafc; color: #0f172a; padding: 20px; }
+        
+        .login-box { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .login-box h2 { margin-bottom: 20px; text-align: center; color: #1e293b; }
+        .login-box input { width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 6px; margin-bottom: 15px; outline: none; }
+        .login-box button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .login-box button:hover { background: #1d4ed8; }
+
+        .dashboard { display: none; max-width: 1200px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        
+        .stats-card { background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-weight: 600; border: 1px solid #e2e8f0; }
+        .stats-card span { color: #2563eb; font-size: 22px; font-weight: 700; }
+
+        /* Google Storage Bar Card */
+        .storage-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+        .storage-card h3 { font-size: 16px; font-weight: 600; color: #1e293b; margin-bottom: 12px; }
+        .storage-bar-wrapper {
+            width: 100%;
+            height: 12px;
+            background-color: #e2e8f0;
+            border-radius: 6px;
+            display: flex;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .storage-segment {
+            height: 100%;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        .storage-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 13px;
+            color: #475569;
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-color { width: 12px; height: 12px; border-radius: 3px; }
+
+        .time-management-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .time-management-card summary {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .time-management-card summary::-webkit-details-marker { display: none; }
+
+        .time-management-card summary .arrow {
+            font-size: 12px;
+            color: #64748b;
+            transition: transform 0.3s ease;
+        }
+
+        .time-management-card[open] summary .arrow { transform: rotate(180deg); }
+
+        .time-card-content { margin-top: 15px; padding-top: 15px; border-top: 1px solid #f1f5f9; }
+        .time-form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
+        .time-form select, .time-form input { padding: 10px 14px; border: 1px solid #cbd5e0; border-radius: 6px; outline: none; font-size: 14px; }
+        .btn-add-time { padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-add-time:hover { background: #1d4ed8; }
+        .time-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+        .time-tag { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 6px 12px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+        .time-tag button { background: none; border: none; color: #ef4444; font-weight: bold; cursor: pointer; font-size: 14px; }
+
+        /* Progressbar Card */
+        .status-progress-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+        }
+        .status-progress-card h3 { font-size: 16px; font-weight: 600; color: #1e293b; margin-bottom: 15px; }
+        .status-items-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .status-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 18px; }
+        .status-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #334155; }
+        .status-badge { font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 12px; }
+        .badge-success { background-color: #dcfce7; color: #15803d; }
+        .badge-pending { background-color: #fef3c7; color: #b45309; }
+        .progress-bar-bg { width: 100%; background-color: #e2e8f0; height: 10px; border-radius: 6px; overflow: hidden; }
+        .progress-bar-fill-success { height: 100%; background: linear-gradient(90deg, #22c55e, #16a34a); border-radius: 6px; transition: width 0.8s ease; }
+        .progress-bar-fill-pending { height: 100%; background: linear-gradient(90deg, #f59e0b, #d97706); border-radius: 6px; transition: width 0.8s ease; }
+
+        /* Qrafiklər Tor Qaydası */
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        @media (max-width: 900px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+        .chart-card { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .chart-card h3 { font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 12px; text-align: center; }
+        .chart-container { position: relative; height: 230px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        /* Mercedes AMG Neon Spidometr Kartı */
+        .speedometer-card { background: #050811; color: white; border: 1px solid #1e293b; border-radius: 12px; padding: 12px 16px; max-width: 100%; box-shadow: 0 0 15px rgba(0, 243, 255, 0.05); }
+        .speedometer-card h3 { color: #00f3ff; font-family: 'Orbitron', sans-serif; font-size: 12px; margin-bottom: 8px; text-align: center; letter-spacing: 1px; text-shadow: 0 0 8px rgba(0,243,255,0.4); }
+        
+        .speedo-main-layout { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+        @media (max-width: 600px) {
+            .speedo-main-layout { flex-direction: column; }
+        }
+
+        /* Soldakı Spidometr (Böyüdülmüş Canvas üçün yer genişləndirildi) */
+        .speedo-left { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 240px; flex-shrink: 0; }
+        
+        /* Sağdakı Region Listi */
+        .speedo-right { flex: 1; max-height: 190px; overflow-y: auto; padding-right: 2px; }
+
+        .region-mini-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #0a0f1d;
+            border: 1px solid #1e293b;
+            border-radius: 4px;
+            padding: 2px 5px;
+            margin-bottom: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .region-mini-item:hover, .region-mini-item.active {
+            background: #111a2e;
+            border-color: #00f3ff;
+            box-shadow: 0 0 8px rgba(0, 243, 255, 0.3);
+        }
+        .region-mini-name { font-size: 9px; font-weight: 600; color: #94a3b8; width: 50px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .region-mini-bar-bg { flex: 1; height: 3px; background: #0f172a; border-radius: 2px; margin: 0 4px; overflow: hidden; }
+        .region-mini-bar-fill { height: 100%; background: linear-gradient(90deg, #00f3ff, #0066ff); border-radius: 2px; transition: width 0.3s ease; }
+        .region-mini-count { font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: bold; color: #00f3ff; width: 20px; text-align: right; }
+
+        .speedometer-select {
+            background: #0a0f1d;
+            color: #00f3ff;
+            border: 1px solid #00f3ff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            font-weight: bold;
+            outline: none;
+            margin-bottom: 4px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 0 6px rgba(0, 243, 255, 0.2);
+        }
+
+        .speedo-right::-webkit-scrollbar { width: 3px; }
+        .speedo-right::-webkit-scrollbar-track { background: #050811; }
+        .speedo-right::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+
+        /* Filtrlər */
+        .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: white; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; align-items: center; }
+        .filters select, .filters input { padding: 10px 14px; border: 1px solid #cbd5e0; border-radius: 6px; outline: none; font-size: 14px; }
+        
+        .btn-refresh { padding: 10px 16px; background: #475569; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-refresh:hover { background: #334155; }
+
+        .btn-excel { padding: 10px 20px; background: #16a34a; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-left: auto; transition: 0.2s; }
+        .btn-excel:hover { background: #15803d; }
+
+        .table-wrapper { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        th, td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #f8fafc; color: #475569; font-weight: 600; }
+        tr:hover { background-color: #f1f5f9; }
+
+        .btn-edit { background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: 0.2s; }
+        .btn-edit:hover { background: #1d4ed8; }
+    </style>
+</head>
+<body>
+
+<div id="loginBox" class="login-box">
+    <h2>Admin Girişi</h2>
+    <input type="password" id="adminPassword" placeholder="Admin Şifrəsini Yazın">
+    <button onclick="login()">Daxil Ol</button>
+    <div id="loginError" style="color:red; margin-top:10px; font-size:13px; text-align:center;"></div>
+</div>
+
+<div id="dashboard" class="dashboard">
+    <div class="header">
+        <h2>Müəllimlərin Qeydiyyat Siyahısı</h2>
+        <div class="stats-card">Seçilən Say: <span id="totalCount">0</span> nəfər</div>
+    </div>
+
+    <!-- Status Proqresbar -->
+    <div class="status-progress-card">
+        <h3>📌 Qeydiyyat Statusu Statistikası (I Sütunu)</h3>
+        <div class="status-items-grid">
+            <div class="status-item">
+                <div class="status-info">
+                    <span>✅ Təsdiq Edilmiş</span>
+                    <span class="status-badge badge-success" id="approvedStat">0 nəfər (0%)</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill-success" id="approvedBar" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <div class="status-item">
+                <div class="status-info">
+                    <span>⏳ Təsdiq Edilməmiş (Gözləyən)</span>
+                    <span class="status-badge badge-pending" id="pendingStat">0 nəfər (0%)</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill-pending" id="pendingBar" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Storage Üslubunda Treninq Vaxtı Qrafiki -->
+    <div class="storage-card">
+        <h3 id="storageTitle">📊 H Sütunu: Treninq Vaxtları Paylanması</h3>
+        <div class="storage-bar-wrapper" id="storageBar"></div>
+        <div class="storage-legend" id="storageLegend"></div>
+    </div>
+
+    <!-- Treninq Vaxtlarının İdarə Edilməsi -->
+    <details class="time-management-card">
+        <summary>⏱ Fənlər üzrə Treninq Vaxtlarının İdarə Edilməsi <span class="arrow">▼</span></summary>
+        <div class="time-card-content">
+            <div class="time-form">
+                <select id="newTimeFenn" style="width: 200px;">
+                    <option value="">-- Fənn seçin --</option>
+                    <option value="Coğrafiya">Coğrafiya</option>
+                    <option value="Riyaziyyat">Riyaziyyat</option>
+                    <option value="Azərbaycan dili">Azərbaycan dili</option>
+                    <option value="İngilis dili">İngilis dili</option>
+                    <option value="Fransız dili">Fransız dili</option>
+                    <option value="Rus dili">Rus dili</option>
+                    <option value="Alman dili">Alman dili</option>
+                    <option value="Gürcü dili">Gürcü dili</option>
+                    <option value="Ərəb dili">Ərəb dili</option>
+                    <option value="Fars dili">Fars dili</option>
+                    <option value="Kimya">Kimya</option>
+                    <option value="Biologiya">Biologiya</option>
+                    <option value="Fizika">Fizika</option>
+                    <option value="Tarix">Tarix</option>
+                    <option value="İnformatika">İnformatika</option>
+                </select>
+                <input type="text" id="newTimeText" placeholder="Məs: 08 oktyabr I növbə" style="flex:1; min-width: 200px;">
+                <button class="btn-add-time" onclick="addTimeSlot()">+ Vaxt Əlavə Et</button>
+            </div>
+            <div id="timeStatus" style="font-size:13px; margin-bottom:10px;"></div>
+            <div class="time-tags" id="timeTagsContainer"></div>
+        </div>
+    </details>
+
+    <!-- Qrafiklər Bölməsi -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>📊 Fənlər üzrə Paylanma</h3>
+            <div class="chart-container">
+                <canvas id="fennChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- MERCEDES AMG NEON SPİDOMETR -->
+        <div class="chart-card speedometer-card">
+            <h3> REGİON MÜƏLLİM SAYI</h3>
+            <div class="speedo-main-layout">
+                <div class="speedo-left">
+                    <select id="speedoRegionSelect" class="speedometer-select" onchange="triggerSpeedometerAnimation()">
+                        <!-- Dinamik Doldurulacaq -->
+                    </select>
+                    <!-- CANVAS ÖLÇÜSÜ BÖYÜDÜLDÜ (230x175) -->
+                    <canvas id="speedometerCanvas" width="250" height="250"></canvas>
+                </div>
+                <div class="speedo-right" id="regionMiniList">
+                    <!-- Dinamik Kiçildilmiş Region Qrafik Listi -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtrlər -->
+    <div class="filters">
+        <input type="text" id="searchInput" onkeyup="onFilterChange()" placeholder="Axtarış (Ad, Soyad, FİN...)" style="width: 220px;">
+        
+        <button class="btn-refresh" onclick="refreshData()">🔄 Yenilə</button>
+
+        <select id="filterFenn" onchange="onFilterChange()">
+            <option value="">Bütün Fənlər</option>
+            <option value="Coğrafiya">Coğrafiya</option>
+            <option value="Riyaziyyat">Riyaziyyat</option>
+            <option value="Azərbaycan dili">Azərbaycan dili</option>
+            <option value="İngilis dili">İngilis dili</option>
+            <option value="Fransız dili">Fransız dili</option>
+            <option value="Rus dili">Rus dili</option>
+            <option value="Alman dili">Alman dili</option>
+            <option value="Gürcü dili">Gürcü dili</option>
+            <option value="Ərəb dili">Ərəb dili</option>
+            <option value="Fars dili">Fars dili</option>
+            <option value="Kimya">Kimya</option>
+            <option value="Biologiya">Biologiya</option>
+            <option value="Fizika">Fizika</option>
+            <option value="Tarix">Tarix</option>
+            <option value="İnformatika">İnformatika</option>
+        </select>
+
+        <select id="filterRegion" onchange="onFilterChange()">
+            <option value="">Bütün Regionlar</option>
+            <option value="BAKI">BAKI</option>
+            <option value="GƏNCƏ">GƏNCƏ</option>
+            <option value="NAXÇIVAN">NAXÇIVAN</option>
+            <option value="ŞƏKİ">ŞƏKİ</option>
+            <option value="BƏRDƏ">BƏRDƏ</option>
+            <option value="ŞİRVAN">ŞİRVAN</option>
+            <option value="GÖYÇAY">GÖYÇAY</option>
+            <option value="LƏNKƏRAN">LƏNKƏRAN</option>
+            <option value="ŞƏMKİR">ŞƏMKİR</option>
+            <option value="XAÇMAZ">XAÇMAZ</option>
+        </select>
+
+        <select id="filterVaxt" onchange="onFilterChange()">
+            <option value="">Bütün Vaxtlar</option>
+        </select>
+
+        <button class="btn-excel" onclick="exportToCSV()">Excel (CSV) İxrac Et</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>FİN</th>
+                    <th>Soyad, Ad, Ata Adı</th>
+                    <th>Telefon</th>
+                    <th>Fənn</th>
+                    <th>Region</th>
+                    <th>İştirak Vaxtı (H)</th>
+                    <th>Təsdiq Statusu (I)</th>
+                    <th>Əməliyyat</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpcgieqXWBkkyLMWoWvJyIiI7ahsesdbco8G70aQwN8Id8Itk890navp-0-MIBvNOITg/exec";
+    let allData = [];
+    let filteredData = [];
+    let savedPassword = "";
+    
+    let fennChartInstance = null;
+
+    // Spidometr İdarəetmə Dəyişənləri
+    let speedoAnimationId = null;
+    let currentNeedleValue = 0;
+    let targetNeedleValue = 0;
+    let MAX_GAUGE = 100;
+
+    const PALETTE = [
+        '#2563eb', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', 
+        '#06b6d4', '#ec4899', '#3b82f6', '#14b8a6', '#f97316'
+    ];
+
+    function getValue(row, keys) {
+        for (let key of keys) {
+            if (row && row[key] !== undefined && row[key] !== null && String(row[key]).trim() !== "") {
+                return String(row[key]).trim();
+            }
+        }
+        return "";
+    }
+
+    function login() {
+        const btn = document.querySelector('.login-box button');
+        savedPassword = document.getElementById('adminPassword').value;
+        const err = document.getElementById('loginError');
+        
+        err.style.color = "#2563eb";
+        err.innerText = "Yoxlanılır...";
+        btn.disabled = true;
+
+        fetch(`${SCRIPT_URL}?action=getAllData&password=${encodeURIComponent(savedPassword)}`)
+        .then(res => res.json())
+        .then(res => {
+            btn.disabled = false;
+            if (res.success) {
+                document.getElementById('loginBox').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                allData = res.data || [];
+                populateVaxtFilterOptions(allData);
+                onFilterChange();
+                loadTimes();
+            } else {
+                err.style.color = "red";
+                err.innerText = res.error || "Yanlış şifrə!";
+            }
+        })
+        .catch(() => {
+            btn.disabled = false;
+            err.style.color = "red";
+            err.innerText = "Xəta baş verdi!";
+        });
+    }
+
+    function refreshData() {
+        const btn = document.querySelector('.btn-refresh');
+        const originalText = btn.innerHTML;
+        
+        btn.disabled = true;
+        btn.innerHTML = "🔄 Yenilənir...";
+
+        fetch(`${SCRIPT_URL}?action=getAllData&password=${encodeURIComponent(savedPassword)}`)
+        .then(res => res.json())
+        .then(res => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            
+            if (res.success) {
+                allData = res.data || [];
+                populateVaxtFilterOptions(allData);
+                onFilterChange();
+            } else {
+                alert(res.error || "Məlumatları yeniləmək mümkün olmadı!");
+            }
+        })
+        .catch(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            alert("Şəbəkə xətası baş verdi!");
+        });
+    }
+
+    function editUser(fin) {
+        if (!fin) {
+            alert("Müəllimin FİN kodu tapılmadı!");
+            return;
+        }
+        window.open(`index.html?fin=${encodeURIComponent(fin)}`, '_blank');
+    }
+
+    function loadTimes() {
+        fetch(`${SCRIPT_URL}?action=getTimes`)
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                const container = document.getElementById('timeTagsContainer');
+                container.innerHTML = '';
+                (res.times || []).forEach(t => {
+                    const tag = document.createElement('div');
+                    tag.className = 'time-tag';
+                    tag.innerHTML = `<strong>${t.fen || t.fenn}:</strong> ${t.vaxt} <button onclick="deleteTimeSlot(${t.row})">&times;</button>`;
+                    container.appendChild(tag);
+                });
+            }
+        });
+    }
+
+    function addTimeSlot() {
+        const fenn = document.getElementById('newTimeFenn').value;
+        const vaxt = document.getElementById('newTimeText').value.trim();
+        const status = document.getElementById('timeStatus');
+
+        if (!fenn || !vaxt) {
+            status.style.color = "red";
+            status.innerText = "Xahiş olunur fənn və vaxtı daxil edin!";
+            return;
+        }
+
+        status.style.color = "#2563eb";
+        status.innerText = "Əlavə edilir...";
+
+        const formData = new FormData();
+        formData.append('action', 'addTime');
+        formData.append('fen', fenn);
+        formData.append('vaxt', vaxt);
+
+        fetch(SCRIPT_URL, { method: 'POST', body: formData })
+        .then(() => {
+            status.style.color = "green";
+            status.innerText = "Vaxt uğurla əlavə olundu!";
+            document.getElementById('newTimeText').value = '';
+            loadTimes();
+        })
+        .catch(() => {
+            status.style.color = "red";
+            status.innerText = "Xəta baş verdi.";
+        });
+    }
+
+    function deleteTimeSlot(row) {
+        if(!confirm("Bu vaxtı silmək istədiyinizdən əminsiniz?")) return;
+        
+        const formData = new FormData();
+        formData.append('action', 'deleteTime');
+        formData.append('row', row);
+
+        fetch(SCRIPT_URL, { method: 'POST', body: formData })
+        .then(() => loadTimes());
+    }
+
+    function populateVaxtFilterOptions(data) {
+        const vaxtSelect = document.getElementById('filterVaxt');
+        const currentVal = vaxtSelect.value;
+        vaxtSelect.innerHTML = '<option value="">Bütün Vaxtlar</option>';
+
+        const uniqueTimes = [...new Set(data.map(item => getValue(item, ['vaxt', 'qeyd_vaxti', 'Vaxt'])).filter(v => v !== ''))];
+        
+        uniqueTimes.sort().forEach(vaxt => {
+            const opt = document.createElement('option');
+            opt.value = vaxt;
+            opt.innerText = vaxt;
+            vaxtSelect.appendChild(opt);
+        });
+        vaxtSelect.value = currentVal;
+    }
+
+    function updateFilterDropdowns() {
+        const selectedFenn = document.getElementById('filterFenn').value;
+        const selectedRegion = document.getElementById('filterRegion').value;
+        const selectedVaxt = document.getElementById('filterVaxt').value;
+
+        const activeFennler = new Set();
+        const activeRegionlar = new Set();
+        const activeVaxtlar = new Set();
+
+        allData.forEach(row => {
+            const f = getValue(row, ['fen', 'fenn', 'Fənn']);
+            const r = getValue(row, ['region', 'Region']);
+            const v = getValue(row, ['vaxt', 'qeyd_vaxti', 'Vaxt']);
+
+            const matchesFenn = !selectedFenn || f === selectedFenn;
+            const matchesRegion = !selectedRegion || r === selectedRegion;
+            const matchesVaxt = !selectedVaxt || v === selectedVaxt;
+
+            if (matchesRegion && matchesVaxt && f) activeFennler.add(f);
+            if (matchesFenn && matchesVaxt && r) activeRegionlar.add(r);
+            if (matchesFenn && matchesRegion && v) activeVaxtlar.add(v);
+        });
+
+        applySelectVisibility('filterFenn', activeFennler);
+        applySelectVisibility('filterRegion', activeRegionlar);
+        applySelectVisibility('filterVaxt', activeVaxtlar);
+    }
+
+    function applySelectVisibility(elementId, activeSet) {
+        const select = document.getElementById(elementId);
+        const options = select.querySelectorAll('option');
+
+        options.forEach(option => {
+            if (option.value === "") return;
+            if (activeSet.has(option.value)) {
+                option.disabled = false;
+                option.style.display = "";
+            } else {
+                option.disabled = true;
+                option.style.display = "none";
+            }
+        });
+    }
+
+    function onFilterChange() {
+        updateFilterDropdowns();
+
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const fenn = document.getElementById('filterFenn').value;
+        const region = document.getElementById('filterRegion').value;
+        const vaxt = document.getElementById('filterVaxt').value;
+
+        filteredData = allData.filter(item => {
+            const fin = getValue(item, ['fin', 'FIN']);
+            const ad = getValue(item, ['ad', 'Ad']);
+            const soyad = getValue(item, ['soyad', 'Soyad']);
+            const phone = getValue(item, ['phone', 'tel']);
+            const itemFenn = getValue(item, ['fen', 'fenn', 'Fənn']);
+            const itemRegion = getValue(item, ['region', 'Region']);
+            const itemVaxt = getValue(item, ['vaxt', 'qeyd_vaxti', 'Vaxt']);
+
+            const matchSearch = (fin + ad + soyad + phone).toLowerCase().includes(search);
+            const matchFenn = fenn === "" || itemFenn === fenn;
+            const matchRegion = region === "" || itemRegion === region;
+            const matchVaxt = vaxt === "" || itemVaxt === vaxt;
+            
+            return matchSearch && matchFenn && matchRegion && matchVaxt;
+        });
+
+        renderTable(filteredData);
+        updateStatusProgressBar(filteredData);
+        renderGoogleStorageBar(filteredData);
+        updateCharts(filteredData);
+        
+        updateSpeedometerAndRegionList(filteredData);
+    }
+
+    function renderTable(data) {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        document.getElementById('totalCount').innerText = data.length;
+
+        data.forEach((row, index) => {
+            const fin = getValue(row, ['fin', 'FIN']);
+            const ad = getValue(row, ['ad', 'Ad']);
+            const soyad = getValue(row, ['soyad', 'Soyad']);
+            const ata = getValue(row, ['ata_adi', 'ata']);
+            const phone = getValue(row, ['phone', 'tel']);
+            const fenn = getValue(row, ['fen', 'fenn', 'Fənn']);
+            const region = getValue(row, ['region', 'Region']);
+            const vaxt = getValue(row, ['vaxt', 'qeyd_vaxti', 'Vaxt']);
+            const statusVal = getValue(row, ['status', 'qeyd_tarixi', 'Status']);
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td><strong>${fin || '-'}</strong></td>
+                <td>${soyad} ${ad} ${ata}</td>
+                <td>${phone || '-'}</td>
+                <td>${fenn || '-'}</td>
+                <td>${region || '-'}</td>
+                <td>${vaxt || '-'}</td>
+                <td>${statusVal || 'Təsdiq Edilməyib'}</td>
+                <td>
+                    <button class="btn-edit" onclick="editUser('${fin}')">✏ Düzəliş et</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function updateStatusProgressBar(data) {
+        const total = data.length;
+        let approvedCount = 0;
+        let pendingCount = 0;
+
+        data.forEach(item => {
+            const val = getValue(item, ['status', 'qeyd_tarixi', 'Status']);
+            if (val && val !== "-" && val.toLowerCase() !== "false") {
+                approvedCount++;
+            } else {
+                pendingCount++;
+            }
+        });
+
+        const approvedPercent = total > 0 ? Math.round((approvedCount / total) * 100) : 0;
+        const pendingPercent = total > 0 ? (100 - approvedPercent) : 0;
+
+        document.getElementById('approvedStat').innerText = `${approvedCount} nəfər (${approvedPercent}%)`;
+        document.getElementById('pendingStat').innerText = `${pendingCount} nəfər (${pendingPercent}%)`;
+
+        document.getElementById('approvedBar').style.width = `${approvedPercent}%`;
+        document.getElementById('pendingBar').style.width = `${pendingPercent}%`;
+    }
+
+    function renderGoogleStorageBar(data) {
+        const storageBar = document.getElementById('storageBar');
+        const storageLegend = document.getElementById('storageLegend');
+        const total = data.length;
+
+        storageBar.innerHTML = '';
+        storageLegend.innerHTML = '';
+
+        if (total === 0) {
+            document.getElementById('storageTitle').innerText = "📊 H Sütunu: Məlumat Yoxdur";
+            return;
+        }
+
+        document.getElementById('storageTitle').innerText = `📊 H Sütunu: Treninq Vaxtları Paylanması (${total} istifadəçi)`;
+
+        const vaxtCounts = {};
+        data.forEach(d => {
+            const v = getValue(d, ['vaxt', 'qeyd_vaxti', 'Vaxt']);
+            if (v) vaxtCounts[v] = (vaxtCounts[v] || 0) + 1;
+        });
+
+        const keys = Object.keys(vaxtCounts);
+        
+        keys.forEach((key, idx) => {
+            const count = vaxtCounts[key];
+            const percent = ((count / total) * 100).toFixed(1);
+            const color = PALETTE[idx % PALETTE.length];
+
+            const seg = document.createElement('div');
+            seg.className = 'storage-segment';
+            seg.style.width = `${percent}%`;
+            seg.style.backgroundColor = color;
+            seg.title = `${key}: ${count} nəfər (${percent}%)`;
+            storageBar.appendChild(seg);
+
+            const leg = document.createElement('div');
+            leg.className = 'legend-item';
+            leg.innerHTML = `
+                <div class="legend-color" style="background-color: ${color}"></div>
+                <span><strong>${key}:</strong> ${count} nəfər (${percent}%)</span>
+            `;
+            storageLegend.appendChild(leg);
+        });
+    }
+
+    function updateCharts(data) {
+        const fennCounts = {};
+        data.forEach(d => {
+            const f = getValue(d, ['fen', 'fenn', 'Fənn']);
+            if (f) fennCounts[f] = (fennCounts[f] || 0) + 1;
+        });
+
+        const fennLabels = Object.keys(fennCounts);
+        const fennValues = Object.values(fennCounts);
+
+        if (fennChartInstance) fennChartInstance.destroy();
+        const ctxFenn = document.getElementById('fennChart').getContext('2d');
+        fennChartInstance = new Chart(ctxFenn, {
+            type: 'doughnut',
+            data: {
+                labels: fennLabels.length ? fennLabels : ['Məlumat Yoxdur'],
+                datasets: [{
+                    data: fennValues.length ? fennValues : [1],
+                    backgroundColor: fennValues.length ? PALETTE : ['#e2e8f0']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { 
+                        position: 'right',
+                        labels: { font: { size: 10 }, boxWidth: 10 }
+                    } 
+                }
+            }
+        });
+    }
+
+    // =========================================================
+    // 🏎️ MERCEDES-AMG NEON SPİDOMETR VƏ REGİON LİSTİ
+    // =========================================================
+
+    function updateSpeedometerAndRegionList(data) {
+        const select = document.getElementById('speedoRegionSelect');
+        const listContainer = document.getElementById('regionMiniList');
+        const currentSelected = select.value;
+
+        // Max göstərici: ÜMUMİ CƏDVƏLİN 10%-i
+        const totalOverallCount = allData.length;
+        MAX_GAUGE = Math.max(Math.ceil(totalOverallCount * 0.10), 10);
+
+        const regCounts = {};
+        data.forEach(d => {
+            const r = getValue(d, ['region', 'Region']);
+            if (r) regCounts[r] = (regCounts[r] || 0) + 1;
+        });
+
+        const sortedRegions = Object.keys(regCounts).sort((a,b) => regCounts[b] - regCounts[a]);
+
+        select.innerHTML = '';
+        if (sortedRegions.length === 0) {
+            select.innerHTML = '<option value="">Region Yoxdur</option>';
+            listContainer.innerHTML = '<div style="color:#64748b; font-size:10px; text-align:center; padding-top:20px;">Məlumat Yoxdur</div>';
+            drawSpeedometer(0, "MƏLUMAT YOXDUR");
+            return;
+        }
+
+        sortedRegions.forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r;
+            opt.innerText = `${r} (${regCounts[r]} müəllim)`;
+            select.appendChild(opt);
+        });
+
+        let activeRegion = (currentSelected && regCounts[currentSelected] !== undefined) ? currentSelected : sortedRegions[0];
+        select.value = activeRegion;
+
+        // Mini qrafik listi
+        listContainer.innerHTML = '';
+        const maxCountInList = Math.max(...Object.values(regCounts), 1);
+
+        sortedRegions.forEach(r => {
+            const cnt = regCounts[r];
+            const pct = (cnt / maxCountInList) * 100;
+            const isActive = r === activeRegion ? 'active' : '';
+
+            const item = document.createElement('div');
+            item.className = `region-mini-item ${isActive}`;
+            item.onclick = () => {
+                select.value = r;
+                triggerSpeedometerAnimation();
+            };
+
+            item.innerHTML = `
+                <div class="region-mini-name" title="${r}">${r}</div>
+                <div class="region-mini-bar-bg">
+                    <div class="region-mini-bar-fill" style="width: ${pct}%"></div>
+                </div>
+                <div class="region-mini-count">${cnt}</div>
+            `;
+            listContainer.appendChild(item);
+        });
+
+        triggerSpeedometerAnimation();
+    }
+
+    function triggerSpeedometerAnimation() {
+        const selectVal = document.getElementById('speedoRegionSelect').value;
+
+        const items = document.querySelectorAll('.region-mini-item');
+        items.forEach(it => {
+            const name = it.querySelector('.region-mini-name').innerText;
+            if (name === selectVal) {
+                it.classList.add('active');
+            } else {
+                it.classList.remove('active');
+            }
+        });
+
+        if (!selectVal) {
+            drawSpeedometer(0, "MƏLUMAT YOXDUR", 0);
+            return;
+        }
+
+        let realCount = 0;
+        filteredData.forEach(d => {
+            const r = getValue(d, ['region', 'Region']);
+            if (r === selectVal) realCount++;
+        });
+
+        // Əqrəbin gedəcəyi hədəf: real sayın 10%-i
+        targetNeedleValue = realCount * 0.10;
+
+        if (speedoAnimationId) cancelAnimationFrame(speedoAnimationId);
+        currentNeedleValue = 0;
+
+        function animate() {
+            const diff = targetNeedleValue - currentNeedleValue;
+            if (Math.abs(diff) < 0.05) {
+                currentNeedleValue = targetNeedleValue;
+                // Əqrəb üçün currentNeedleValue (10%), mətn çərçivəsi üçün realCount (100%) göndərilir
+                drawSpeedometer(currentNeedleValue, selectVal, realCount);
+                return;
+            }
+
+            currentNeedleValue += diff * 0.08;
+            if (currentNeedleValue < 0) currentNeedleValue = 0;
+
+            // Əqrəb animasiya ilə sürüşür, mətn turnsüz tam real say kimi qalır
+            drawSpeedometer(currentNeedleValue, selectVal, realCount);
+            speedoAnimationId = requestAnimationFrame(animate);
+        }
+
+        speedoAnimationId = requestAnimationFrame(animate);
+    }
+
+    function drawSpeedometer(value, regionName) {
+        const canvas = document.getElementById('speedometerCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+
+        ctx.clearRect(0, 0, width, height);
+
+        // DAİRƏ ÖLÇÜSÜ BÖYÜDÜLDÜ (Radius: 78px, Mərkəz cy: height / 2 - 5)
+        const cx = width / 2;
+        const cy = height / 2 - 5;
+        const radius = 78; 
+
+        const startAngle = 0.82 * Math.PI;
+        const endAngle = 2.18 * Math.PI;
+
+        // 1. Mercedes AMG Stil Xrom və Neon Haşiyə
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius + 6, startAngle, endAngle);
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius + 2, startAngle, endAngle);
+        ctx.strokeStyle = '#00f3ff';
+        ctx.shadowColor = '#00f3ff';
+        ctx.shadowBlur = 10;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+
+        // 2. Neon İşıqlı Bölgülər və Rəqəmlər
+        const mainSteps = 5; 
+        const subStepsPerMain = 4; 
+        const totalSubTicks = mainSteps * subStepsPerMain;
+
+        for (let i = 0; i <= totalSubTicks; i++) {
+            const p = i / totalSubTicks;
+            const angle = startAngle + p * (endAngle - startAngle);
+            const isMain = i % subStepsPerMain === 0;
+
+            const innerR = isMain ? radius - 10 : radius - 5;
+            const outerR = radius;
+
+            const x1 = cx + Math.cos(angle) * innerR;
+            const y1 = cy + Math.sin(angle) * innerR;
+            const x2 = cx + Math.cos(angle) * outerR;
+            const y2 = cy + Math.sin(angle) * outerR;
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+
+            if (p >= 0.8) {
+                ctx.strokeStyle = '#ff0055';
+                ctx.shadowColor = '#ff0055';
+                ctx.shadowBlur = 8;
+            } else {
+                ctx.strokeStyle = isMain ? '#00f3ff' : '#0066ff';
+                if (isMain) {
+                    ctx.shadowColor = '#00f3ff';
+                    ctx.shadowBlur = 6;
+                }
+            }
+            
+            ctx.lineWidth = isMain ? 2.5 : 1;
+            ctx.stroke();
+            ctx.restore();
+
+            if (isMain) {
+                const valNum = Math.round(p * MAX_GAUGE);
+                const textR = radius - 18;
+                const tx = cx + Math.cos(angle) * textR;
+                const ty = cy + Math.sin(angle) * textR;
+
+                ctx.save();
+                ctx.fillStyle = p >= 0.8 ? '#ff80a0' : '#ffffff';
+                ctx.font = 'bold 10px Orbitron, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                if (p < 0.8) {
+                    ctx.shadowColor = '#00f3ff';
+                    ctx.shadowBlur = 4;
+                }
+                ctx.fillText(valNum, tx, ty);
+                ctx.restore();
+            }
+        }
+
+        // 3. Mərkəzi Mercedes AMG Başlığı
+        ctx.save();
+        ctx.fillStyle = '#00f3ff';
+        ctx.font = 'bold 11px Orbitron, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = '#00f3ff';
+        ctx.shadowBlur = 8;
+        ctx.fillText(regionName, cx, cy - 28);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '700 8px Orbitron, sans-serif';
+        ctx.shadowBlur = 0;
+        ctx.fillText("MAX*10", cx, cy - 16);
+        ctx.restore();
+
+        // 4. REAL SAY ÇƏRÇİVƏSİ (Azca aşağı endirildi: cy + 28)
+        const boxW = 88;
+        const boxH = 18;
+        const boxX = cx - boxW / 2;
+        const boxY = cy + 43;
+
+        ctx.save();
+        ctx.fillStyle = '#030712';
+        ctx.strokeStyle = '#00f3ff';
+        ctx.lineWidth = 1.2;
+        ctx.shadowColor = '#00f3ff';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.roundRect(boxX, boxY, boxW, boxH, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#00f3ff';
+        ctx.font = 'bold 10px Orbitron, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${Math.round(value*10)} NƏFƏR`, cx, boxY + 14);
+        ctx.restore();
+
+        // 5. Mercedes ƏQRƏB (Neon Göy/Qırmızı Parıltılı)
+        const safeValue = Math.max(0, Math.min(value, MAX_GAUGE));
+        const currentAngle = startAngle + (safeValue / MAX_GAUGE) * (endAngle - startAngle);
+        const needleLen = radius - 8;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(currentAngle + Math.PI / 2);
+
+        ctx.shadowColor = '#00f3ff';
+        ctx.shadowBlur = 12;
+
+        ctx.beginPath();
+        ctx.moveTo(-2, 0);
+        ctx.lineTo(2, 0);
+        ctx.lineTo(0, -needleLen);
+        ctx.closePath();
+        ctx.fillStyle = '#00f3ff';
+        ctx.fill();
+        ctx.restore();
+
+        // 6. Mərkəzi Xrom Nöqtə
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#1e293b';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+        ctx.fillStyle = '#00f3ff';
+        ctx.shadowColor = '#00f3ff';
+        ctx.shadowBlur = 6;
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function exportToCSV() {
+        let csvContent = "\uFEFFFIN,Soyad,Ad,Ata Adi,Telefon,Fenn,Region,İştirak Vaxtı,Təsdiq Statusu\n";
+        
+        filteredData.forEach(row => {
+            csvContent += `"${getValue(row, ['fin'])}","${getValue(row, ['soyad'])}","${getValue(row, ['ad'])}","${getValue(row, ['ata_adi'])}","${getValue(row, ['phone'])}","${getValue(row, ['fen', 'fenn'])}","${getValue(row, ['region'])}","${getValue(row, ['vaxt', 'qeyd_vaxti'])}","${getValue(row, ['status', 'qeyd_tarixi'])}"\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const linkElem = document.createElement("a");
+        linkElem.href = URL.createObjectURL(blob);
+        linkElem.setAttribute("download", "muellimler_qeydiyyat.csv");
+        document.body.appendChild(linkElem);
+        linkElem.click();
+        document.body.removeChild(linkElem);
+    }
+</script>
+
+</body>
+</html>
