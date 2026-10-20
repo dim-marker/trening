@@ -104,7 +104,6 @@
             border-color: #e2e8f0;
         }
 
-        /* Readonly FİN sahəsinin stili */
         input[readonly] {
             background-color: #f1f5f9;
             color: #475569;
@@ -112,14 +111,32 @@
             border-color: #cbd5e0;
         }
 
-        .fin-input-wrapper {
-            position: relative;
+        .fin-input-box {
+            display: flex;
+            gap: 8px;
         }
 
-        .fin-input-wrapper input {
+        .fin-input-box input {
             text-transform: uppercase;
             font-weight: 600;
             letter-spacing: 1px;
+            flex: 1;
+        }
+
+        .btn-search {
+            padding: 12px 18px;
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+
+        .btn-search:hover {
+            background-color: #0369a1;
         }
 
         .info-text {
@@ -151,8 +168,9 @@
         }
 
         .btn-submit:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
+            background-color: #94a3b8;
         }
 
         #statusMessage {
@@ -168,19 +186,11 @@
             gap: 10px;
         }
 
-        #statusMessage.info {
-            display: flex;
-            background-color: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-        }
-
         #statusMessage.loading {
             display: flex;
             background-color: #e0f2fe;
             color: #0369a1;
             border: 1px solid #bae6fd;
-            letter-spacing: 0.5px;
         }
 
         #statusMessage.success {
@@ -188,13 +198,6 @@
             background-color: #f0fdf4;
             color: #15803d;
             border: 1px solid #bbf7d0;
-        }
-
-        #statusMessage.warning {
-            display: flex;
-            background-color: #fefce8;
-            color: #a16207;
-            border: 1px solid #fef08a;
         }
 
         #statusMessage.error {
@@ -211,7 +214,6 @@
             border-bottom-color: transparent;
             border-radius: 50%;
             display: inline-block;
-            box-sizing: border-box;
             animation: rotation 1s linear infinite;
         }
 
@@ -232,37 +234,38 @@
     <form id="registrationForm">
         <div class="form-group">
             <label for="fin">FİN Kodunuz:</label>
-            <div class="fin-input-wrapper">
-                <input type="text" id="fin" name="fin" maxlength="7" required placeholder=" " autocomplete="off">
+            <div class="fin-input-box">
+                <input type="text" id="fin" name="fin" maxlength="10" required placeholder="FİN daxil edin" autocomplete="off">
+                <button type="button" class="btn-search" onclick="checkFinInDatabase()">🔍 Axtar</button>
             </div>
-            <div class="info-text">7 simvol daxil etdikdə məlumatlarınız axtarılacaq.</div>
+            <div class="info-text">FİN kodu yazdıqdan sonra "Axtar" düyməsini sıxın.</div>
         </div>
 
         <div class="form-group grid-2">
             <div>
                 <label for="soyad">Soyad:</label>
-                <input type="text" id="soyad" name="soyad" required placeholder=" ">
+                <input type="text" id="soyad" name="soyad" required placeholder=" " disabled>
             </div>
             <div>
                 <label for="ad">Ad:</label>
-                <input type="text" id="ad" name="ad" required placeholder=" ">
+                <input type="text" id="ad" name="ad" required placeholder=" " disabled>
             </div>
         </div>
 
         <div class="form-group grid-2">
             <div>
                 <label for="ata_adi">Ata Adı:</label>
-                <input type="text" id="ata_adi" name="ata_adi" required placeholder=" ">
+                <input type="text" id="ata_adi" name="ata_adi" required placeholder=" " disabled>
             </div>
             <div>
                 <label for="phone">Mobil Telefon:</label>
-                <input type="tel" id="phone" name="phone" required placeholder=" ">
+                <input type="tel" id="phone" name="phone" required placeholder=" " disabled>
             </div>
         </div>
 
         <div class="form-group">
             <label for="fen">Tədris Etdiyiniz Fənn:</label>
-            <select id="fen" name="fen" required onchange="handleFennChange()">
+            <select id="fen" name="fen" required disabled onchange="handleFennChange()">
                 <option value="">-- Fənn seçin --</option>
                 <option value="Riyaziyyat">Riyaziyyat</option>
                 <option value="Azərbaycan dili">Azərbaycan dili</option>
@@ -279,7 +282,7 @@
 
         <div class="form-group">
             <label for="region">Region Bölməsi:</label>
-            <select id="region" name="region" required onchange="handleRegionChange()">
+            <select id="region" name="region" required disabled onchange="handleRegionChange()">
                 <option value="">-- Region seçin --</option>
                 <option value="BAKI">BAKI</option>
                 <option value="GƏNCƏ">GƏNCƏ</option>
@@ -301,7 +304,7 @@
             </select>
         </div>
 
-        <button type="submit" id="submitBtn" class="btn-submit">Məlumatları Təsdiqlə</button>
+        <button type="submit" id="submitBtn" class="btn-submit" disabled>Məlumatları Təsdiqlə</button>
     </form>
 
     <div id="statusMessage"></div>
@@ -311,7 +314,7 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpcgieqXWBkkyLMWoWvJyIiI7ahsesdbco8G70aQwN8Id8Itk890navp-0-MIBvNOITg/exec";
 
     let dynamicTimes = [];
-    let lastCheckedFin = "";
+    let isFinVerified = false;
 
     window.addEventListener('load', () => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -319,7 +322,6 @@
 
         if (finParam) {
             const finInput = document.getElementById('fin');
-
             if (finInput) {
                 finInput.value = finParam;
                 checkFinInDatabase();
@@ -327,7 +329,6 @@
         }
     });
 
-    // Səhifə açıldıqda cədvəldən canlı vaxtları çəkir
     fetch(`${SCRIPT_URL}?action=getTimes`)
         .then(res => res.json())
         .then(res => {
@@ -364,18 +365,12 @@
         }
     }
 
-    function handleRegionChange() {
-        updateVaxtOptions();
-    }
-
-    function handleFennChange() {
-        updateVaxtOptions();
-    }
+    function handleRegionChange() { updateVaxtOptions(); }
+    function handleFennChange() { updateVaxtOptions(); }
 
     function showStatus(msg, type, showSpinner = false) {
         const status = document.getElementById('statusMessage');
         status.className = type;
-        
         if (showSpinner) {
             status.innerHTML = `<span class="spinner"></span> <span>${msg}</span>`;
         } else {
@@ -383,22 +378,21 @@
         }
     }
 
-    function toggleFormDisabled(isDisabled) {
+    function toggleFormFields(enable) {
         const inputs = document.querySelectorAll('#registrationForm input, #registrationForm select, #submitBtn');
         inputs.forEach(el => {
             if (el.id !== 'fin') { 
-                el.disabled = isDisabled;
+                el.disabled = !enable;
             }
         });
     }
 
     function resetEntireForm() {
         document.getElementById('registrationForm').reset();
-        
-        // FİN sahəsinin kilidini açırıq
         const finInput = document.getElementById('fin');
         finInput.readOnly = false;
-
+        isFinVerified = false;
+        toggleFormFields(false);
         updateVaxtOptions();
         document.getElementById('submitBtn').innerText = "Məlumatları Təsdiqlə";
     }
@@ -408,20 +402,20 @@
         const finVal = finInput.value.trim().toUpperCase();
         finInput.value = finVal;
 
-        if (finVal.length < 7 || finVal === lastCheckedFin) return;
+        if (!finVal) {
+            showStatus("Xahiş olunur FİN kod daxil edin!", "error");
+            return;
+        }
 
         showStatus("MƏLUMATINIZ AXTARILIR...", "loading", true);
-        toggleFormDisabled(true);
-        lastCheckedFin = finVal;
 
         fetch(`${SCRIPT_URL}?fin=${encodeURIComponent(finVal)}`)
         .then(res => res.json())
         .then(data => {
-            toggleFormDisabled(false);
-            
             if (data.exists) {
-                // Məlumat tapıldıqda FİN kod sahəsini dəyişdirilməz (readOnly) edirik
-                finInput.readOnly = true;
+                isFinVerified = true;
+                finInput.readOnly = true; 
+                toggleFormFields(true);  
 
                 document.getElementById('soyad').value = data.soyad || '';
                 document.getElementById('ad').value = data.ad || '';
@@ -436,20 +430,19 @@
                 showStatus("Məlumatlarınız tapıldı. Yoxlayıb təsdiqləyə bilərsiniz.", "success");
             } else {
                 resetEntireForm();
-                lastCheckedFin = "";
-                showStatus("Məlumatlarınız tapılmadı", "error");
+                finInput.value = finVal;
+                showStatus("Sizin FİN kodunuz ekspertlər siyahısında tapılmadı!", "error");
             }
         })
         .catch(err => {
-            toggleFormDisabled(false);
             console.error(err);
             showStatus("Yoxlanış zamanı xəta baş verdi.", "error");
         });
     }
 
-    document.getElementById('fin').addEventListener('blur', checkFinInDatabase);
-    document.getElementById('fin').addEventListener('input', function() {
-        if (this.value.trim().length === 7) {
+    document.getElementById('fin').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
             checkFinInDatabase();
         }
     });
@@ -457,12 +450,16 @@
     document.getElementById('registrationForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
+        if (!isFinVerified) {
+            showStatus("Xəta: Daxil edilən FİN kod bazada tapılmayıb!", "error");
+            return;
+        }
+
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
         btn.innerText = "Yazılır...";
         showStatus("Məlumatlar cədvələ işlənir...", "loading", true);
 
-        // FormData readOnly sahələri avtomatik olaraq özünə daxil edir
         const formData = new FormData(this);
 
         fetch(SCRIPT_URL, { method: 'POST', body: formData })
@@ -470,7 +467,6 @@
         .then(response => {
             showStatus("Məlumatlarınız uğurla təsdiqləndi və bazada yeniləndi!", "success");
             resetEntireForm();
-            lastCheckedFin = "";
         })
         .catch(error => {
             showStatus("Xəta baş verdi. Yenidən cəhd edin.", "error");
