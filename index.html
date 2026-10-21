@@ -472,37 +472,24 @@
                 updateVaxtOptions(data.vaxt || '');
 
                 // BİLDİRİŞ BANNERİ: Əgər əvvəllər vaxt və ya status varsa ekranda xüsusi panel çıxır
-                // BİLDİRİŞ BANNERİ DƏQİQ DÜZƏLİŞİ
-const banner = document.getElementById('prevRegBanner');
-const prevTimeSpan = document.getElementById('bannerPrevTime');
-const prevDateSpan = document.getElementById('bannerPrevDate');
+                // BİLDİRİŞ BANNERİ DƏYİŞİKLİYİ
+                const banner = document.getElementById('prevRegBanner');
+                const prevTimeSpan = document.getElementById('bannerPrevTime');
+                const prevDateSpan = document.getElementById('bannerPrevDate');
 
-const rawVaxt = (data.vaxt || data.qeyd_vaxti || "").toString().trim();
-const rawStatus = (data.status || data.qeyd_tarixi || "").toString().trim();
+                // Sütun adları müxtəlif ola biləcəyi üçün hamısını yoxlayırıq
+                const savedVaxt = data.vaxt || data.qeyd_vaxti || "Seçilməyib";
+                const savedStatus = data.status || data.qeyd_tarixi || data.tarix || "Təsdiqlənib";
 
-// Əgər istifadəçi heç vaxt təsdiq etməyibsə və ya boşdursa:
-const isApproved = rawStatus !== "" && rawStatus !== "-" && rawStatus.toLowerCase() !== "false";
+                if (savedVaxt !== "Seçilməyib" || savedStatus !== "Təsdiqlənməyib") {
+                    prevTimeSpan.innerText = savedVaxt;
+                    // Əgər dəyər True/False və ya tarixdirsə, aydın mətnlə göstəririk
+                    prevDateSpan.innerText = (savedStatus === true || savedStatus === "true") ? "Təsdiqlənib" : savedStatus;
+                    banner.style.display = 'block';
+                } else {
+                    banner.style.display = 'none';
+                }
 
-if (isApproved) {
-    // Vaxt BAKI olmadıqda və ya boş olduqda düzgün mətn çıxarırıq
-    if (rawVaxt !== "") {
-        prevTimeSpan.innerText = rawVaxt;
-    } else {
-        prevTimeSpan.innerText = (data.region === "BAKI") ? "Seçilməyib" : "Tələb olunmur (Region BAKI deyil)";
-    }
-
-    // Status / Tarix göstəricisi
-    if (rawStatus.toLowerCase() === "true") {
-        prevDateSpan.innerText = "Təsdiqlənib";
-    } else {
-        prevDateSpan.innerText = rawStatus; // Əgər tarixdirdə tarixi göstərir
-    }
-
-    banner.style.display = 'block';
-} else {
-    // Əgər hələ təsdiq etməyibsə, banner göstərilmir
-    banner.style.display = 'none';
-}
                 document.getElementById('submitBtn').innerText = "Məlumatları Yenilə və Təsdiqlə";
                 showStatus("Məlumatlarınız tapıldı. Yoxlayıb təsdiqləyə bilərsiniz.", "success");
             } else {
