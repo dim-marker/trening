@@ -145,6 +145,26 @@
             margin-top: 5px;
         }
 
+        /* Əvvəlki Qeydiyyat Bildiriş Paneli */
+        .previous-reg-banner {
+            display: none;
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #166534;
+            line-height: 1.5;
+        }
+        .previous-reg-banner strong {
+            color: #15803d;
+        }
+        .previous-reg-banner ul {
+            margin-top: 6px;
+            padding-left: 18px;
+        }
+
         .btn-submit {
             width: 100%;
             padding: 14px;
@@ -229,6 +249,15 @@
     <div class="form-header">
         <h2>Qeydiyyat</h2>
         <p>Məlumatlarınızı təsdiqləyin və ya yeniləyin</p>
+    </div>
+
+    <!-- Əvvəlki Qeydiyyat Tarixi və Vaxtı Bildiriş Paneli -->
+    <div id="prevRegBanner" class="previous-reg-banner">
+        <div><strong>ℹ️ Əvvəlki Qeydiyyat Məlumatınız:</strong></div>
+        <ul>
+            <li><strong>Seçilmiş Vaxt:</strong> <span id="bannerPrevTime">-</span></li>
+            <li><strong>Təsdiq Tarixi:</strong> <span id="bannerPrevDate">-</span></li>
+        </ul>
     </div>
 
     <form id="registrationForm">
@@ -347,16 +376,31 @@
             vaxtSelect.required = true;
 
             const availableTimes = dynamicTimes.filter(t => t.fen === fenn);
+            let foundSaved = false;
 
             if (availableTimes.length > 0) {
                 availableTimes.forEach(item => {
                     const opt = document.createElement('option');
                     opt.value = item.vaxt;
                     opt.innerText = item.vaxt;
-                    if (item.vaxt === savedVaxt) opt.selected = true;
+                    if (item.vaxt === savedVaxt) {
+                        opt.selected = true;
+                        foundSaved = true;
+                    }
                     vaxtSelect.appendChild(opt);
                 });
-            } else {
+            }
+
+            // MƏSƏLƏNİN HƏLLİ: Əgər istifadəçinin əvvəl seçdiyi vaxt silinibsə, onu yenə də siyahıya xüsusi qeydlə əlavə edirik!
+            if (savedVaxt && !foundSaved && savedVaxt !== "-") {
+                const opt = document.createElement('option');
+                opt.value = savedVaxt;
+                opt.innerText = `${savedVaxt} (Əvvəlki seçiminiz)`;
+                opt.selected = true;
+                vaxtSelect.appendChild(opt);
+            }
+
+            if (vaxtSelect.options.length <= 1) {
                 vaxtSelect.innerHTML = '<option value="">Bu fənn üçün aktiv vaxt tapılmadı</option>';
             }
         } else {
@@ -393,6 +437,7 @@
         finInput.readOnly = false;
         isFinVerified = false;
         toggleFormFields(false);
+        document.getElementById('prevRegBanner').style.display = 'none';
         updateVaxtOptions();
         document.getElementById('submitBtn').innerText = "Məlumatları Təsdiqlə";
     }
@@ -425,6 +470,25 @@
                 document.getElementById('region').value = data.region || '';
 
                 updateVaxtOptions(data.vaxt || '');
+
+                // BİLDİRİŞ BANNERİ: Əgər əvvəllər vaxt və ya status varsa ekranda xüsusi panel çıxır
+                // BİLDİRİŞ BANNERİ DƏYİŞİKLİYİ
+                const banner = document.getElementById('prevRegBanner');
+                const prevTimeSpan = document.getElementById('bannerPrevTime');
+                const prevDateSpan = document.getElementById('bannerPrevDate');
+
+                // Sütun adları müxtəlif ola biləcəyi üçün hamısını yoxlayırıq
+                const savedVaxt = data.vaxt || data.qeyd_vaxti || "Seçilməyib";
+                const savedStatus = data.status || data.qeyd_tarixi || data.tarix || "Təsdiqlənib";
+
+                if (savedVaxt !== "Seçilməyib" || savedStatus !== "Təsdiqlənməyib") {
+                    prevTimeSpan.innerText = savedVaxt;
+                    // Əgər dəyər True/False və ya tarixdirsə, aydın mətnlə göstəririk
+                    prevDateSpan.innerText = (savedStatus === true || savedStatus === "true") ? "Təsdiqlənib" : savedStatus;
+                    banner.style.display = 'block';
+                } else {
+                    banner.style.display = 'none';
+                }
 
                 document.getElementById('submitBtn').innerText = "Məlumatları Yenilə və Təsdiqlə";
                 showStatus("Məlumatlarınız tapıldı. Yoxlayıb təsdiqləyə bilərsiniz.", "success");
